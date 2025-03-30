@@ -2,10 +2,9 @@ const CACHE_NAME = "pwa-cache-v1";
 const ASSETS_TO_CACHE = [
     "/",
     "/index.html",
-    "/manifest.json",
-    "/icon-192.png",
-    "/icon-512.png"
+    "/manifest.json"
 ];
+
 
 // Installeer de service worker en cache de bestanden
 self.addEventListener("install", (event) => {
