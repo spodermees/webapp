@@ -29,6 +29,24 @@
     <p>Deze webapp kan als een app op je telefoon worden toegevoegd.</p>
     <button onclick="notifyUser()">Stuur een notificatie</button>
 
-    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('sw.js')
+                .then(() => console.log('Service Worker geregistreerd'))
+                .catch(error => console.log('Service Worker registratie mislukt:', error));
+        }
+
+        function notifyUser() {
+            if (Notification.permission === 'granted') {
+                new Notification('Hallo! Dit is een testnotificatie.');
+            } else if (Notification.permission !== 'denied') {
+                Notification.requestPermission().then(permission => {
+                    if (permission === 'granted') {
+                        new Notification('Hallo! Dit is een testnotificatie.');
+                    }
+                });
+            }
+        }
+    </script>
 </body>
 </html>
