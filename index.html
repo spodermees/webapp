@@ -9,7 +9,8 @@
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-
+    <link rel="apple-touch-icon" href="icon-192.png"> <!-- Verwijzing naar de iconen -->
+    
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -28,24 +29,6 @@
     <p>Deze webapp kan als een app op je telefoon worden toegevoegd.</p>
     <button onclick="notifyUser()">Stuur een notificatie</button>
 
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('sw.js')
-                .then(() => console.log('Service Worker geregistreerd'))
-                .catch(error => console.log('Service Worker registratie mislukt:', error));
-        }
-
-        function notifyUser() {
-            if (Notification.permission === 'granted') {
-                new Notification('Hallo! Dit is een testnotificatie.');
-            } else if (Notification.permission !== 'denied') {
-                Notification.requestPermission().then(permission => {
-                    if (permission === 'granted') {
-                        new Notification('Hallo! Dit is een testnotificatie.');
-                    }
-                });
-            }
-        }
-    </script>
+    <script src="app.js"></script>
 </body>
 </html>

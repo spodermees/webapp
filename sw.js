@@ -5,7 +5,6 @@ const ASSETS_TO_CACHE = [
     "/manifest.json"
 ];
 
-
 // Installeer de service worker en cache de bestanden
 self.addEventListener("install", (event) => {
     event.waitUntil(
