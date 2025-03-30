@@ -1,10 +1,10 @@
 const CACHE_NAME = 'v1';
 const CACHE_ASSETS = [
-    '/',
-    '/index.html',
-    '/manifest.json',
-    '/icon-192.png',
-    '/icon-512.png'
+    './', // Gebruik './' in plaats van '/'
+    './index.html',
+    './manifest.json',
+    './icon-192.png',
+    './icon-512.png'
 ];
 
 // Service Worker installeren
@@ -14,7 +14,10 @@ self.addEventListener('install', (event) => {
         caches.open(CACHE_NAME)
             .then((cache) => {
                 console.log('Bestanden gecached');
-                return cache.addAll(CACHE_ASSETS);
+                return cache.addAll(CACHE_ASSETS.map((asset) => {
+                    console.log('Cachen:', asset);
+                    return asset;
+                }));
             })
             .catch((error) => {
                 console.error('Caching mislukt:', error);
