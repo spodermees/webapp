@@ -13,7 +13,7 @@ self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open(CACHE_NAME)
             .then((cache) => {
-                console.log('Bestanden gecached');
+                console.log('Bestanden worden gecached...');
                 return cache.addAll(CACHE_ASSETS.map((asset) => {
                     console.log('Cachen:', asset);
                     return asset;
