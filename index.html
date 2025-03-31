@@ -3,35 +3,120 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mijn PWA</title>
+    <title>SportBuddy</title>
     
     <!-- PWA instellingen -->
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon-192.png"> <!-- Verwijzing naar de iconen -->
-    
+    <link rel="apple-touch-icon" href="icon-192.png">
+    <script src="app.js"></script>
+
+    <!-- CSS -->
     <style>
         body {
             font-family: Arial, sans-serif;
-            text-align: center;
-            margin: 50px;
-            background-color: black;
-            color: white;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            color: #333;
         }
-        button {
+
+        header {
+            background-color: #000;
+            color: #fff;
             padding: 10px 20px;
-            font-size: 16px;
-            cursor: pointer;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .card {
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            padding: 15px;
+        }
+
+        .card img {
+            width: 100%;
+            border-radius: 10px;
+        }
+
+        .card h3 {
+            margin: 10px 0 5px;
+        }
+
+        .card p {
+            margin: 0;
+            color: #666;
+        }
+
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 18px;
+        }
+
+        .navbar a:hover {
+            text-decoration: underline;
         }
     </style>
 </head>
 <body>
-    <h1>Welkom bij mijn PWA!</h1>
-    <p>Deze webapp kan als een app op je telefoon worden toegevoegd.</p>
-    <button onclick="notifyUser()">Stuur een notificatie</button>
+    <header>SportBuddy</header>
 
-    <script src="app.js"></script>
+    <div class="container">
+        <button onclick="startCamera()" style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px; cursor: pointer;">
+            Start Camera
+        </button>
+
+        <div class="card">
+            <h3>David Martinez</h3>
+            <p>Just finished the marathon!</p>
+            <img src="https://via.placeholder.com/300x150" alt="Marathon">
+        </div>
+
+        <div class="card">
+            <h3>Jessica Moore</h3>
+            <p>Amazing job! 👏</p>
+        </div>
+
+        <div class="card">
+            <h3>Matt Johnson</h3>
+            <p>Congrats, David! Well done.</p>
+        </div>
+    </div>
+
+    <div class="photo-strip" style="display: flex; justify-content: center; align-items: center; overflow-x: auto; padding: 10px; background-color: #f4f4f4; border-top: 1px solid #ccc;">
+        <!-- Foto's worden hier toegevoegd -->
+    </div>
+
+    <div class="navbar">
+        <a href="#">Home</a>
+        <a href="#">Feed</a>
+        <a href="#">Profile</a>
+        <a href="#">Settings</a>
+    </div>
 </body>
 </html>
