@@ -87,7 +87,7 @@
     <header>SportBuddy</header>
 
     <div class="container">
-        <button onclick="startCamera()" style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px; cursor: pointer;">
+        <button onclick="openCameraModal()" style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px; cursor: pointer;">
             Start Camera
         </button>
 
@@ -105,6 +105,15 @@
         <div class="card">
             <h3>Matt Johnson</h3>
             <p>Congrats, David! Well done.</p>
+        </div>
+    </div>
+
+    <div id="cameraModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center;">
+        <div style="background: #fff; padding: 20px; border-radius: 10px; text-align: center; width: 90%; max-width: 400px;">
+            <h2>Maak een Foto</h2>
+            <video id="cameraVideo" autoplay playsinline style="width: 100%; border-radius: 10px;"></video>
+            <button id="captureButton" style="padding: 10px 20px; margin-top: 10px; cursor: pointer;">Neem Foto</button>
+            <button onclick="closeCameraModal()" style="padding: 10px 20px; margin-top: 10px; cursor: pointer; background-color: red; color: white;">Sluiten</button>
         </div>
     </div>
 

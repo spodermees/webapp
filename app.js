@@ -1,5 +1,33 @@
 let videoStream;
 
+function openCameraModal() {
+    const modal = document.getElementById('cameraModal');
+    modal.style.display = 'flex';
+
+    const videoElement = document.getElementById('cameraVideo');
+
+    // Vraag toegang tot de camera
+    navigator.mediaDevices.getUserMedia({ video: true })
+        .then((stream) => {
+            videoStream = stream;
+            videoElement.srcObject = stream;
+        })
+        .catch((error) => {
+            console.error('Camera toegang geweigerd of niet beschikbaar:', error);
+            alert('Kan geen toegang krijgen tot de camera. Controleer je instellingen.');
+        });
+}
+
+function closeCameraModal() {
+    const modal = document.getElementById('cameraModal');
+    modal.style.display = 'none';
+
+    // Stop de camera
+    if (videoStream) {
+        videoStream.getTracks().forEach((track) => track.stop());
+    }
+}
+
 // Controleer of de browser notificaties ondersteunt
 function notifyUser() {
     if (!("Notification" in window)) {
@@ -110,6 +138,33 @@ function loadSavedPhotos() {
 
 document.addEventListener('DOMContentLoaded', () => {
     loadSavedPhotos();
+    document.getElementById('captureButton').addEventListener('click', () => {
+        const videoElement = document.getElementById('cameraVideo');
+        const canvas = document.createElement('canvas');
+        canvas.width = videoElement.videoWidth;
+        canvas.height = videoElement.videoHeight;
+
+        const context = canvas.getContext('2d');
+        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+
+        // Converteer de foto naar een Base64-string
+        const photoData = canvas.toDataURL('image/png');
+
+        // Voeg de foto toe aan de strook
+        const photoStrip = document.querySelector('.photo-strip');
+        const img = document.createElement('img');
+        img.src = photoData;
+        img.alt = 'Gemaakte foto';
+        img.style.width = '25%';
+        img.style.margin = '5px';
+        photoStrip.appendChild(img);
+
+        // Sla de foto op in LocalStorage
+        savePhoto(photoData);
+
+        // Sluit het modaal
+        closeCameraModal();
+    });
 });
 
 // Log een bericht om te bevestigen dat het script is geladen
