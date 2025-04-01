@@ -136,6 +136,17 @@ function loadSavedPhotos() {
     });
 }
 
+function clearPhotos() {
+    // Verwijder alle foto's uit de foto-strook
+    const photoStrip = document.querySelector('.photo-strip');
+    photoStrip.innerHTML = '';
+
+    // Verwijder de foto's uit LocalStorage
+    localStorage.removeItem('photos');
+
+    alert('Alle foto\'s zijn verwijderd.');
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     loadSavedPhotos();
     document.getElementById('captureButton').addEventListener('click', () => {
