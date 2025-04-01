@@ -72,15 +72,45 @@ function capturePhoto(videoElement) {
         videoStream.getTracks().forEach((track) => track.stop());
     }
 
+    // Converteer de foto naar een Base64-string
+    const photoData = canvas.toDataURL('image/png');
+
     // Voeg de foto toe aan de strook
     const photoStrip = document.querySelector('.photo-strip');
     const img = document.createElement('img');
-    img.src = canvas.toDataURL('image/png');
+    img.src = photoData;
     img.alt = 'Gemaakte foto';
-    img.style.width = '10%'; // Schaal de afbeelding naar 10% van de breedte
+    img.style.width = '25%';
     img.style.margin = '5px';
     photoStrip.appendChild(img);
+
+    // Sla de foto op in LocalStorage
+    savePhoto(photoData);
 }
+
+function savePhoto(photoData) {
+    const savedPhotos = JSON.parse(localStorage.getItem('photos')) || [];
+    savedPhotos.push(photoData);
+    localStorage.setItem('photos', JSON.stringify(savedPhotos));
+}
+
+function loadSavedPhotos() {
+    const savedPhotos = JSON.parse(localStorage.getItem('photos')) || [];
+    const photoStrip = document.querySelector('.photo-strip');
+
+    savedPhotos.forEach((photoData) => {
+        const img = document.createElement('img');
+        img.src = photoData;
+        img.alt = 'Opgeslagen foto';
+        img.style.width = '25%';
+        img.style.margin = '5px';
+        photoStrip.appendChild(img);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadSavedPhotos();
+});
 
 // Log een bericht om te bevestigen dat het script is geladen
 console.log("app.js is geladen.");
