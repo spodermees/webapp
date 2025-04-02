@@ -4,93 +4,54 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SportBuddy</title>
-    <!-- PWA instellingen -->
-    <meta name="mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="theme-color" content="#000000">
-    <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="icon-192.png">
-    
     <style>
-        /* Basisstijlen - Geoptimaliseerd voor snelheid */
-        * {
-            box-sizing: border-box;
+        body {
+            font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-        }
-        
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #f4f4f4;
-            color: #333;
-            line-height: 1.5;
+            background-color: #f4f4f4;
             padding-bottom: 60px;
         }
-        
         header {
-            background: #000;
+            background-color: #000;
             color: #fff;
-            padding: 12px 0;
+            padding: 15px;
             text-align: center;
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            font-size: 20px;
         }
-        
         .container {
             padding: 15px;
             max-width: 600px;
             margin: 0 auto;
         }
-        
-        /* Card Styling */
         .card {
             background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-            margin-bottom: 16px;
+            border-radius: 10px;
+            margin-bottom: 15px;
             overflow: hidden;
-            transform: translateZ(0); /* Hardware versnelling */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
-        
-        .card-image-container {
-            position: relative;
+        .card img {
             width: 100%;
-            padding-top: 100%; /* Vierkante verhouding */
-            background: #000;
+            height: auto;
+            display: block;
         }
-        
-        .card-image-container img {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
         .card-content {
-            padding: 12px 16px;
+            padding: 12px;
         }
-        
-        .card h3 {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 6px;
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #000;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
         }
-        
-        .card p {
-            font-size: 14px;
-            color: #555;
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
         }
-        
-        .card-time {
-            color: #999;
-            font-size: 12px;
-            margin-top: 8px;
-        }
-        
-        /* Camera Modal */
         #cameraModal {
             display: none;
             position: fixed;
@@ -100,76 +61,81 @@
             height: 100%;
             background: rgba(0,0,0,0.9);
             z-index: 1000;
-            justify-content: center;
-            align-items: center;
         }
-        
         .modal-content {
-            width: 95%;
+            width: 100%;
             max-width: 400px;
+            margin: 20px auto;
             background: #fff;
-            border-radius: 12px;
+            border-radius: 10px;
             overflow: hidden;
         }
-        
-        .video-container {
-            width: 100%;
-            background: #000;
-        }
-        
         #cameraVideo {
             width: 100%;
-            display: block;
+            background: #000;
         }
-        
-        /* Knoppen */
-        .btn {
-            display: inline-block;
-            padding: 12px 20px;
-            font-size: 16px;
+        .modal-buttons {
+            padding: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .modal-buttons button {
+            flex: 1;
+            padding: 10px;
             border: none;
-            border-radius: 8px;
+            border-radius: 5px;
             cursor: pointer;
-            text-align: center;
-            width: 100%;
-            margin-top: 10px;
         }
-        
-        .btn-primary {
-            background: #3897f0;
+        #captureButton {
+            background: #4CAF50;
             color: white;
         }
-        
-        .btn-danger {
-            background: #ed4956;
+        #closeCamera {
+            background: #f44336;
             color: white;
         }
-        
-        /* Navigatie */
-        .navbar {
+        #previewModal {
+            display: none;
             position: fixed;
-            bottom: 0;
+            top: 0;
             left: 0;
             width: 100%;
-            background: #000;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-            z-index: 10;
+            height: 100%;
+            background: rgba(0,0,0,0.9);
+            z-index: 1001;
         }
-        
-        .navbar a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 14px;
-            padding: 8px 12px;
-        }
-        
-        /* Loading state */
-        .loading {
+        .preview-content {
+            background: #fff;
+            max-width: 400px;
+            margin: 20px auto;
             padding: 20px;
-            text-align: center;
-            color: #fff;
+            border-radius: 10px;
+        }
+        #previewImage {
+            max-width: 100%;
+            max-height: 60vh;
+            display: block;
+            margin: 0 auto;
+        }
+        #confirmPost {
+            background: #4CAF50;
+            color: white;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        #cancelPost {
+            background: #f44336;
+            color: white;
+            width: 100%;
+            padding: 10px;
+            margin-top: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
         }
     </style>
 </head>
@@ -177,100 +143,145 @@
     <header>SportBuddy</header>
     
     <div class="container">
-        <button id="openCamera" class="btn btn-primary">
-            📷 Nieuwe Post Maken
+        <button id="openCamera" style="width:100%;padding:10px;margin-bottom:20px;background:#000;color:#fff;border:none;border-radius:5px;">
+            Camera Openen
         </button>
         
-        <!-- Voorbeeld post -->
-        <div class="card">
-            <div class="card-image-container">
-                <img src="https://via.placeholder.com/600x600/3897f0/ffffff?text=Sport" alt="Voorbeeld">
-            </div>
-            <div class="card-content">
-                <h3>David</h3>
-                <p>Net een nieuwe personal record gehaald! 💪</p>
-                <div class="card-time">2 uur geleden</div>
-            </div>
+        <div id="postsContainer">
+            <!-- Posts komen hier -->
         </div>
-        
-        <!-- Posts worden hier geladen -->
     </div>
     
     <!-- Camera Modal -->
     <div id="cameraModal">
         <div class="modal-content">
-            <div class="video-container">
-                <video id="cameraVideo" autoplay playsinline></video>
+            <video id="cameraVideo" autoplay playsinline></video>
+            <div class="modal-buttons">
+                <button id="captureButton">Foto maken</button>
+                <button id="closeCamera">Sluiten</button>
             </div>
-            <button id="captureButton" class="btn btn-primary">Foto Maken</button>
-            <button id="closeCamera" class="btn btn-danger">Annuleren</button>
         </div>
     </div>
     
-    <!-- Navigatie -->
-    <nav class="navbar">
-        <a href="#">🏠 Home</a>
-        <a href="#">🔍 Ontdek</a>
-        <a href="#">➕ Post</a>
-        <a href="#">👤 Profiel</a>
-    </nav>
+    <!-- Preview Modal -->
+    <div id="previewModal">
+        <div class="preview-content">
+            <img id="previewImage">
+            <textarea id="postCaption" placeholder="Voeg een beschrijving toe..." style="width:100%;margin:10px 0;padding:10px;border:1px solid #ddd;border-radius:5px;"></textarea>
+            <button id="confirmPost">Posten</button>
+            <button id="cancelPost">Annuleren</button>
+        </div>
+    </div>
     
+    <nav class="navbar">
+        <a href="#">Home</a>
+        <a href="#">Feed</a>
+        <a href="#">Profiel</a>
+    </nav>
+
     <script>
-        // Basis camera functionaliteit
+        // Camera functionaliteit
         let videoStream = null;
+        let currentPhoto = null;
         
-        document.getElementById('openCamera').addEventListener('click', async () => {
-            const modal = document.getElementById('cameraModal');
-            modal.style.display = 'flex';
+        // Elementen
+        const openCameraBtn = document.getElementById('openCamera');
+        const cameraModal = document.getElementById('cameraModal');
+        const closeCameraBtn = document.getElementById('closeCamera');
+        const captureBtn = document.getElementById('captureButton');
+        const cameraVideo = document.getElementById('cameraVideo');
+        const previewModal = document.getElementById('previewModal');
+        const previewImage = document.getElementById('previewImage');
+        const confirmPostBtn = document.getElementById('confirmPost');
+        const cancelPostBtn = document.getElementById('cancelPost');
+        const postCaption = document.getElementById('postCaption');
+        const postsContainer = document.getElementById('postsContainer');
+        
+        // Camera openen
+        openCameraBtn.addEventListener('click', async () => {
+            cameraModal.style.display = 'block';
             
             try {
-                // Probeer achterkant camera eerst
+                // Gebruik selfie camera (user) in plaats van environment
                 videoStream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'environment' },
+                    video: { 
+                        facingMode: 'user',
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 }
+                    },
                     audio: false
-                }).catch(async () => {
-                    // Fallback naar voorkant camera
-                    return await navigator.mediaDevices.getUserMedia({
-                        video: { facingMode: 'user' },
-                        audio: false
-                    });
                 });
                 
-                const video = document.getElementById('cameraVideo');
-                video.srcObject = videoStream;
-                video.play();
-                
+                cameraVideo.srcObject = videoStream;
             } catch (error) {
-                alert('Kon camera niet starten: ' + error.message);
-                modal.style.display = 'none';
+                alert('Kon camera niet openen: ' + error.message);
+                cameraModal.style.display = 'none';
             }
         });
         
-        document.getElementById('closeCamera').addEventListener('click', () => {
-            const modal = document.getElementById('cameraModal');
-            modal.style.display = 'none';
-            
+        // Camera sluiten
+        closeCameraBtn.addEventListener('click', () => {
+            cameraModal.style.display = 'none';
             if (videoStream) {
                 videoStream.getTracks().forEach(track => track.stop());
                 videoStream = null;
             }
         });
         
-        document.getElementById('captureButton').addEventListener('click', () => {
-            const video = document.getElementById('cameraVideo');
+        // Foto maken
+        captureBtn.addEventListener('click', () => {
             const canvas = document.createElement('canvas');
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
-            
+            canvas.width = cameraVideo.videoWidth;
+            canvas.height = cameraVideo.videoHeight;
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
             
-            // Toon preview (simpele implementatie)
-            const photoData = canvas.toDataURL('image/jpeg');
-            alert('Foto gemaakt! In een echte app zou je hier een preview tonen.');
+            // Spiegelen voor selfie camera
+            ctx.translate(canvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(cameraVideo, 0, 0, canvas.width, canvas.height);
             
-            // Sluit camera
-            document.getElementById('closeCamera').click();
+            currentPhoto = canvas.toDataURL('image/jpeg');
+            previewImage.src = currentPhoto;
+            
+            // Toon preview
+            cameraModal.style.display = 'none';
+            previewModal.style.display = 'block';
+            
+            // Reset beschrijving
+            postCaption.value = '';
+        });
+        
+        // Post bevestigen
+        confirmPostBtn.addEventListener('click', () => {
+            if (!currentPhoto) return;
+            
+            const caption = postCaption.value.trim() || 'Mijn sportmoment!';
+            
+            // Post toevoegen
+            const postHTML = `
+                <div class="card">
+                    <img src="${currentPhoto}" alt="Sportmoment">
+                    <div class="card-content">
+                        <h3>Jij</h3>
+                        <p>${caption}</p>
+                    </div>
+                </div>
+            `;
+            
+            postsContainer.insertAdjacentHTML('afterbegin', postHTML);
+            
+            // Modals sluiten
+            previewModal.style.display = 'none';
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+        });
+        
+        // Post annuleren
+        cancelPostBtn.addEventListener('click', () => {
+            previewModal.style.display = 'none';
+            currentPhoto = null;
         });
     </script>
 </body>
