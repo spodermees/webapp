@@ -1,20 +1,20 @@
 let videoStream;
 
+// Functies voor camera
 function openCameraModal() {
     const modal = document.getElementById('cameraModal');
     modal.style.display = 'flex';
 
     const videoElement = document.getElementById('cameraVideo');
 
-    // Vraag toegang tot de camera
     navigator.mediaDevices.getUserMedia({ video: true })
         .then((stream) => {
             videoStream = stream;
             videoElement.srcObject = stream;
         })
         .catch((error) => {
-            console.error('Camera toegang geweigerd of niet beschikbaar:', error);
-            alert('Kan geen toegang krijgen tot de camera. Controleer je instellingen.');
+            console.error('Camera toegang geweigerd:', error);
+            alert('Camera toegang geweigerd. Controleer je instellingen.');
         });
 }
 
@@ -22,24 +22,23 @@ function closeCameraModal() {
     const modal = document.getElementById('cameraModal');
     modal.style.display = 'none';
 
-    // Stop de camera
     if (videoStream) {
-        videoStream.getTracks().forEach((track) => track.stop());
+        videoStream.getTracks().forEach(track => track.stop());
     }
 }
 
+// Post bevestiging en creatie
 function confirmPost(photoData) {
     const modal = document.getElementById('cameraModal');
     modal.style.display = 'none';
 
-    // Maak een preview modal
     const previewModal = document.createElement('div');
     previewModal.style.position = 'fixed';
     previewModal.style.top = '0';
     previewModal.style.left = '0';
     previewModal.style.width = '100%';
     previewModal.style.height = '100%';
-    previewModal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    previewModal.style.backgroundColor = 'rgba(0,0,0,0.8)';
     previewModal.style.zIndex = '1000';
     previewModal.style.display = 'flex';
     previewModal.style.justifyContent = 'center';
@@ -49,61 +48,70 @@ function confirmPost(photoData) {
     previewContent.style.background = '#fff';
     previewContent.style.padding = '20px';
     previewContent.style.borderRadius = '10px';
-    previewContent.style.textAlign = 'center';
     previewContent.style.width = '90%';
     previewContent.style.maxWidth = '400px';
 
-    // Voeg de foto toe
-    const img = document.createElement('img');
-    img.src = photoData;
-    img.alt = 'Preview van de foto';
-    img.style.width = '100%';
-    img.style.borderRadius = '10px';
-    previewContent.appendChild(img);
+    function confirmPost(photoData) {
+        // ... bestaande code ...
 
-    // Voeg caption input toe
+        const img = document.createElement('img');
+        img.src = photoData;
+        img.style.maxWidth = '100%';
+        img.style.borderRadius = '10px';
+
+        // Mobiel vs desktop instellingen
+        if (window.innerWidth >= 768) {
+            img.style.maxHeight = '400px';
+            img.style.objectFit = 'scale-down';
+        } else {
+            img.style.maxHeight = '300px';
+            img.style.objectFit = 'contain';
+        }
+
+        previewContent.appendChild(img);
+
+        // ... rest van de functie ...
+    }
+
     const captionInput = document.createElement('textarea');
-    captionInput.placeholder = 'Voeg een beschrijving toe...';
+    captionInput.placeholder = 'Wat heb je gedaan?';
     captionInput.style.width = '100%';
-    captionInput.style.marginTop = '10px';
+    captionInput.style.margin = '10px 0';
     captionInput.style.padding = '10px';
+    captionInput.style.border = '1px solid #ddd';
     captionInput.style.borderRadius = '5px';
-    captionInput.style.border = '1px solid #ccc';
+    captionInput.style.minHeight = '60px';
     previewContent.appendChild(captionInput);
 
-    // Voeg post button toe
-    const postButton = document.createElement('button');
-    postButton.textContent = 'Posten';
-    postButton.style.padding = '10px 20px';
-    postButton.style.marginTop = '10px';
-    postButton.style.cursor = 'pointer';
-    postButton.style.backgroundColor = '#28a745';
-    postButton.style.color = '#fff';
-    postButton.style.border = 'none';
-    postButton.style.borderRadius = '5px';
-    postButton.onclick = () => {
-        const caption = captionInput.value || 'Geen beschrijving';
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.display = 'flex';
+    buttonContainer.style.justifyContent = 'space-between';
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = 'Annuleren';
+    cancelBtn.style.padding = '10px 20px';
+    cancelBtn.style.background = '#ff4444';
+    cancelBtn.style.color = 'white';
+    cancelBtn.style.border = 'none';
+    cancelBtn.style.borderRadius = '5px';
+    cancelBtn.onclick = () => document.body.removeChild(previewModal);
+    buttonContainer.appendChild(cancelBtn);
+
+    const postBtn = document.createElement('button');
+    postBtn.textContent = 'Posten';
+    postBtn.style.padding = '10px 20px';
+    postBtn.style.background = '#4CAF50';
+    postBtn.style.color = 'white';
+    postBtn.style.border = 'none';
+    postBtn.style.borderRadius = '5px';
+    postBtn.onclick = () => {
+        const caption = captionInput.value.trim() || 'Nieuwe sportprestatie!';
         createPost(photoData, caption);
         document.body.removeChild(previewModal);
     };
-    previewContent.appendChild(postButton);
+    buttonContainer.appendChild(postBtn);
 
-    // Voeg cancel button toe
-    const cancelButton = document.createElement('button');
-    cancelButton.textContent = 'Annuleren';
-    cancelButton.style.padding = '10px 20px';
-    cancelButton.style.marginTop = '10px';
-    cancelButton.style.marginLeft = '10px';
-    cancelButton.style.cursor = 'pointer';
-    cancelButton.style.backgroundColor = 'red';
-    cancelButton.style.color = '#fff';
-    cancelButton.style.border = 'none';
-    cancelButton.style.borderRadius = '5px';
-    cancelButton.onclick = () => {
-        document.body.removeChild(previewModal);
-    };
-    previewContent.appendChild(cancelButton);
-
+    previewContent.appendChild(buttonContainer);
     previewModal.appendChild(previewContent);
     document.body.appendChild(previewModal);
 }
@@ -111,116 +119,99 @@ function confirmPost(photoData) {
 function createPost(photoData, caption) {
     const container = document.querySelector('.container');
     const postCard = document.createElement('div');
-    postCard.classList.add('card');
+    postCard.className = 'card';
 
-    // Voeg de foto toe
     const img = document.createElement('img');
     img.src = photoData;
-    img.alt = 'Gemaakte foto';
-    img.style.width = '100%';
-    img.style.borderRadius = '10px';
+    img.alt = 'Sport moment';
     postCard.appendChild(img);
 
-    // Voeg de gebruikersnaam toe
     const username = document.createElement('h3');
-    username.textContent = 'Jouw Profiel';
+    username.textContent = 'Jij';
     postCard.appendChild(username);
 
-    // Voeg de caption toe
-    const captionElement = document.createElement('p');
-    captionElement.textContent = caption;
-    postCard.appendChild(captionElement);
+    const captionEl = document.createElement('p');
+    captionEl.textContent = caption;
+    postCard.appendChild(captionEl);
 
-    // Voeg de post toe na de startknop maar boven andere posts
-    const startButton = document.querySelector('.container button');
-    if (startButton) {
-        startButton.insertAdjacentElement('afterend', postCard);
+    // Voeg toe na de camera knop
+    const cameraBtn = document.querySelector('.container button');
+    if (cameraBtn) {
+        cameraBtn.insertAdjacentElement('afterend', postCard);
     } else {
         container.prepend(postCard);
     }
 
-    // Sla de post op
     savePost(photoData, caption);
 }
 
+// Opslaan en laden van posts
 function savePost(photoData, caption) {
-    const savedPosts = JSON.parse(localStorage.getItem('posts')) || [];
-    savedPosts.unshift({ photo: photoData, caption: caption }); // Voeg toe aan begin van array
-    localStorage.setItem('posts', JSON.stringify(savedPosts));
+    let posts = JSON.parse(localStorage.getItem('sportbuddy_posts')) || [];
+    posts.unshift({ photo: photoData, caption: caption });
+    localStorage.setItem('sportbuddy_posts', JSON.stringify(posts));
 }
 
-function loadSavedPosts() {
-    const savedPosts = JSON.parse(localStorage.getItem('posts')) || [];
+function loadPosts() {
+    const posts = JSON.parse(localStorage.getItem('sportbuddy_posts')) || [];
     const container = document.querySelector('.container');
 
-    savedPosts.forEach((post) => {
+    posts.forEach(post => {
         const postCard = document.createElement('div');
-        postCard.classList.add('card');
+        postCard.className = 'card';
 
-        // Voeg de foto toe
         const img = document.createElement('img');
         img.src = post.photo;
-        img.alt = 'Opgeslagen foto';
-        img.style.width = '100%';
-        img.style.borderRadius = '10px';
+        img.alt = 'Opgeslagen sport moment';
         postCard.appendChild(img);
 
-        // Voeg de gebruikersnaam toe
         const username = document.createElement('h3');
-        username.textContent = 'Jouw Profiel';
+        username.textContent = 'Jij';
         postCard.appendChild(username);
 
-        // Voeg de caption toe
-        const captionElement = document.createElement('p');
-        captionElement.textContent = post.caption;
-        postCard.appendChild(captionElement);
+        const captionEl = document.createElement('p');
+        captionEl.textContent = post.caption;
+        postCard.appendChild(captionEl);
 
-        // Voeg de post toe na de startknop maar boven andere posts
-        const startButton = document.querySelector('.container button');
-        if (startButton) {
-            startButton.insertAdjacentElement('afterend', postCard);
+        const cameraBtn = document.querySelector('.container button');
+        if (cameraBtn) {
+            cameraBtn.insertAdjacentElement('afterend', postCard);
         } else {
             container.prepend(postCard);
         }
     });
 }
 
+// Verwijder posts
 function clearPhotos() {
-    if (confirm("Weet je zeker dat je alle posts wilt verwijderen?")) {
-        // Verwijder alle posts uit de container
-        const container = document.querySelector('.container');
-        const cards = container.querySelectorAll('.card');
-        cards.forEach(card => {
-            // Behoud alleen de eerste drie voorbeeld-cards en de camera button
-            if (!card.querySelector('h3') || 
+    if (confirm('Weet je zeker dat je alle posts wilt verwijderen?')) {
+        localStorage.removeItem('sportbuddy_posts');
+        document.querySelectorAll('.container .card').forEach(card => {
+            if (!card.querySelector('h3') ||
                 !['David Martinez', 'Jessica Moore', 'Matt Johnson'].includes(card.querySelector('h3').textContent)) {
                 card.remove();
             }
         });
-
-        // Verwijder de posts uit LocalStorage
-        localStorage.removeItem('posts');
-
-        alert('Alle posts zijn verwijderd.');
     }
 }
 
+// Event listeners
 document.addEventListener('DOMContentLoaded', () => {
-    loadSavedPosts();
-    
+    loadPosts();
+
     document.getElementById('captureButton').addEventListener('click', () => {
-        const videoElement = document.getElementById('cameraVideo');
+        const video = document.getElementById('cameraVideo');
         const canvas = document.createElement('canvas');
-        canvas.width = videoElement.videoWidth;
-        canvas.height = videoElement.videoHeight;
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
 
-        const context = canvas.getContext('2d');
-        context.drawImage(videoElement, 0, 0, canvas.width, canvas.height);
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
 
-        const photoData = canvas.toDataURL('image/png');
+        const photoData = canvas.toDataURL('image/jpeg', 0.8); // Compressie kwaliteit
         confirmPost(photoData);
         closeCameraModal();
     });
 });
 
-console.log("app.js is geladen.");
+console.log("app.js is geladen");   

@@ -1,10 +1,11 @@
 <!DOCTYPE html>
 <html lang="nl">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SportBuddy</title>
-    
+
     <!-- PWA instellingen -->
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
@@ -81,13 +82,53 @@
         .navbar a:hover {
             text-decoration: underline;
         }
+
+        /* Basisstijl voor alle apparaten */
+        .card img {
+            width: 100%;
+            border-radius: 10px;
+            display: block;
+        }
+
+        /* Mobiele weergave (standaard) */
+        .card img {
+            max-height: 300px;
+            height: auto;
+            object-fit: contain;
+        }
+
+        /* Desktop weergave */
+        @media (min-width: 768px) {
+            .card img {
+                max-height: 400px;
+                object-fit: scale-down;
+            }
+
+            /* Optioneel: fixed height container voor desktop */
+            .card {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .card img {
+                width: auto;
+                max-width: 100%;
+                max-height: 100%;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+        }
     </style>
 </head>
+
 <body>
     <header>SportBuddy</header>
 
     <div class="container">
-        <button onclick="openCameraModal()" style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px; cursor: pointer;">
+        <button onclick="openCameraModal()"
+            style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px; cursor: pointer;">
             Start Camera
         </button>
 
@@ -112,20 +153,25 @@
         <!-- Posts worden hier toegevoegd -->
     </div>
 
-    <div id="cameraModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center;">
-        <div style="background: #fff; padding: 20px; border-radius: 10px; text-align: center; width: 90%; max-width: 400px;">
+    <div id="cameraModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center;">
+        <div
+            style="background: #fff; padding: 20px; border-radius: 10px; text-align: center; width: 90%; max-width: 400px;">
             <h2>Maak een Foto</h2>
             <video id="cameraVideo" autoplay playsinline style="width: 100%; border-radius: 10px;"></video>
             <button id="captureButton" style="padding: 10px 20px; margin-top: 10px; cursor: pointer;">Neem Foto</button>
-            <button onclick="closeCameraModal()" style="padding: 10px 20px; margin-top: 10px; cursor: pointer; background-color: red; color: white;">Sluiten</button>
+            <button onclick="closeCameraModal()"
+                style="padding: 10px 20px; margin-top: 10px; cursor: pointer; background-color: red; color: white;">Sluiten</button>
         </div>
     </div>
 
-    <div class="photo-strip" style="display: flex; justify-content: center; align-items: center; overflow-x: auto; padding: 10px; background-color: #f4f4f4; border-top: 1px solid #ccc;">
+    <div class="photo-strip"
+        style="display: flex; justify-content: center; align-items: center; overflow-x: auto; padding: 10px; background-color: #f4f4f4; border-top: 1px solid #ccc;">
         <!-- Foto's worden hier toegevoegd -->
     </div>
 
-    <button onclick="clearPhotos()" style="padding: 10px 20px; margin: 20px auto; display: block; cursor: pointer; background-color: red; color: white; border: none; border-radius: 5px;">
+    <button onclick="clearPhotos()"
+        style="padding: 10px 20px; margin: 20px auto; display: block; cursor: pointer; background-color: red; color: white; border: none; border-radius: 5px;">
         Verwijder Alle Foto's
     </button>
 
@@ -136,4 +182,5 @@
         <a href="#">Settings</a>
     </div>
 </body>
+
 </html>
