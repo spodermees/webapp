@@ -1,11 +1,10 @@
 <!DOCTYPE html>
 <html lang="nl">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SportBuddy</title>
-
+    
     <!-- PWA instellingen -->
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
@@ -22,6 +21,7 @@
             padding: 0;
             background-color: #f4f4f4;
             color: #333;
+            padding-bottom: 60px; /* Ruimte voor navbar */
         }
 
         header {
@@ -42,23 +42,71 @@
 
         .card {
             background: #fff;
-            border-radius: 10px;
-            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            margin-bottom: 24px;
+            overflow: hidden;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            width: 100%;
         }
 
-        .card img {
+        /* Responsieve afbeeldingen */
+        .card-image-container {
             width: 100%;
-            border-radius: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-image-container img {
+            width: 100%;
+            display: block;
+        }
+
+        /* Mobiel (standaard) */
+        .card-image-container img {
+            max-height: 70vh;
+            object-fit: contain;
+        }
+
+        /* Desktop */
+        @media (min-width: 768px) {
+            .card-image-container {
+                height: 500px;
+            }
+            .card-image-container img {
+                height: 100%;
+                width: auto;
+                max-width: 100%;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                object-fit: cover;
+            }
+        }
+
+        .card-content {
+            padding: 12px 16px;
         }
 
         .card h3 {
-            margin: 10px 0 5px;
+            margin: 0 0 8px 0;
+            font-size: 16px;
+            font-weight: 600;
         }
 
         .card p {
             margin: 0;
             color: #666;
+            font-size: 14px;
+        }
+
+        .card-time {
+            color: #8e8e8e;
+            font-size: 12px;
+            margin-top: 8px;
         }
 
         .navbar {
@@ -83,97 +131,97 @@
             text-decoration: underline;
         }
 
-        /* Basisstijl voor alle apparaten */
-        .card img {
+        #cameraModal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background: #fff;
+            padding: 20px;
             border-radius: 10px;
-            display: block;
+            text-align: center;
+            width: 90%;
+            max-width: 400px;
         }
 
-        /* Mobiele weergave (standaard) */
-        .card img {
-            max-height: 300px;
-            height: auto;
-            object-fit: contain;
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+            margin: 5px;
         }
 
-        /* Desktop weergave */
-        @media (min-width: 768px) {
-            .card img {
-                max-height: 400px;
-                object-fit: scale-down;
-            }
+        .btn-primary {
+            background-color: #4CAF50;
+            color: white;
+        }
 
-            /* Optioneel: fixed height container voor desktop */
-            .card {
-                position: relative;
-                overflow: hidden;
-            }
+        .btn-danger {
+            background-color: #ff4444;
+            color: white;
+        }
 
-            .card img {
-                width: auto;
-                max-width: 100%;
-                max-height: 100%;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-            }
+        textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            min-height: 60px;
+            font-family: Arial, sans-serif;
         }
     </style>
 </head>
-
 <body>
     <header>SportBuddy</header>
 
     <div class="container">
-        <button onclick="openCameraModal()"
-            style="padding: 10px 20px; font-size: 16px; margin-bottom: 20px; cursor: pointer;">
+        <button onclick="openCameraModal()" class="btn-primary">
             Start Camera
         </button>
 
+        <!-- Voorbeeld posts -->
         <div class="card">
-            <h3>David Martinez</h3>
-            <p>Just finished the marathon!</p>
-            <!-- <img src="https://via.placeholder.com/300x150" alt="Marathon"> -->
+            <div class="card-image-container">
+                <img src="https://via.placeholder.com/600x800" alt="Marathon">
+            </div>
+            <div class="card-content">
+                <h3>David Martinez</h3>
+                <p>Just finished the marathon!</p>
+                <div class="card-time">2 uur geleden</div>
+            </div>
         </div>
 
         <div class="card">
-            <h3>Jessica Moore</h3>
-            <p>Amazing job! 👏</p>
+            <div class="card-content">
+                <h3>Jessica Moore</h3>
+                <p>Amazing job! 👏</p>
+                <div class="card-time">1 dag geleden</div>
+            </div>
         </div>
 
-        <div class="card">
-            <h3>Matt Johnson</h3>
-            <p>Congrats, David! Well done.</p>
-        </div>
-    </div>
-
-    <div class="container">
         <!-- Posts worden hier toegevoegd -->
     </div>
 
-    <div id="cameraModal"
-        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); z-index: 1000; justify-content: center; align-items: center;">
-        <div
-            style="background: #fff; padding: 20px; border-radius: 10px; text-align: center; width: 90%; max-width: 400px;">
+    <div id="cameraModal">
+        <div class="modal-content">
             <h2>Maak een Foto</h2>
             <video id="cameraVideo" autoplay playsinline style="width: 100%; border-radius: 10px;"></video>
-            <button id="captureButton" style="padding: 10px 20px; margin-top: 10px; cursor: pointer;">Neem Foto</button>
-            <button onclick="closeCameraModal()"
-                style="padding: 10px 20px; margin-top: 10px; cursor: pointer; background-color: red; color: white;">Sluiten</button>
+            <button id="captureButton" class="btn-primary">Neem Foto</button>
+            <button onclick="closeCameraModal()" class="btn-danger">Sluiten</button>
         </div>
     </div>
-
-    <div class="photo-strip"
-        style="display: flex; justify-content: center; align-items: center; overflow-x: auto; padding: 10px; background-color: #f4f4f4; border-top: 1px solid #ccc;">
-        <!-- Foto's worden hier toegevoegd -->
-    </div>
-
-    <button onclick="clearPhotos()"
-        style="padding: 10px 20px; margin: 20px auto; display: block; cursor: pointer; background-color: red; color: white; border: none; border-radius: 5px;">
-        Verwijder Alle Foto's
-    </button>
 
     <div class="navbar">
         <a href="#">Home</a>
@@ -182,5 +230,4 @@
         <a href="#">Settings</a>
     </div>
 </body>
-
 </html>
