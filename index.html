@@ -4,128 +4,93 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SportBuddy</title>
-    
     <!-- PWA instellingen -->
-    <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#000000">
+    <link rel="manifest" href="manifest.json">
     <link rel="apple-touch-icon" href="icon-192.png">
-    <script src="app.js"></script>
-
-    <!-- CSS -->
+    
     <style>
-        body {
-            font-family: Arial, sans-serif;
+        /* Basisstijlen - Geoptimaliseerd voor snelheid */
+        * {
+            box-sizing: border-box;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f4f4f4;
             color: #333;
+            line-height: 1.5;
             padding-bottom: 60px;
         }
-
+        
         header {
-            background-color: #000;
+            background: #000;
             color: #fff;
-            padding: 10px 20px;
+            padding: 12px 0;
             text-align: center;
-            font-size: 24px;
-            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
-
+        
         .container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            padding: 20px;
+            padding: 15px;
+            max-width: 600px;
+            margin: 0 auto;
         }
-
+        
+        /* Card Styling */
         .card {
             background: #fff;
             border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 16px;
             overflow: hidden;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-            width: 100%;
+            transform: translateZ(0); /* Hardware versnelling */
         }
-
+        
         .card-image-container {
-            width: 100%;
             position: relative;
-            overflow: hidden;
-        }
-
-        .card-image-container img {
             width: 100%;
-            display: block;
+            padding-top: 100%; /* Vierkante verhouding */
+            background: #000;
         }
-
-        /* Mobiele weergave */
+        
         .card-image-container img {
-            max-height: 70vh;
-            object-fit: contain;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
         }
-
-        /* Desktop weergave */
-        @media (min-width: 768px) {
-            .card-image-container {
-                height: 500px;
-            }
-            .card-image-container img {
-                height: 100%;
-                width: auto;
-                max-width: 100%;
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                object-fit: cover;
-            }
-        }
-
+        
         .card-content {
             padding: 12px 16px;
         }
-
+        
         .card h3 {
-            margin: 0 0 8px 0;
             font-size: 16px;
             font-weight: 600;
+            margin-bottom: 6px;
         }
-
+        
         .card p {
-            margin: 0;
-            color: #666;
             font-size: 14px;
+            color: #555;
         }
-
+        
         .card-time {
-            color: #8e8e8e;
+            color: #999;
             font-size: 12px;
             margin-top: 8px;
         }
-
-        .navbar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background-color: #000;
-            color: #fff;
-            display: flex;
-            justify-content: space-around;
-            padding: 10px 0;
-        }
-
-        .navbar a {
-            color: #fff;
-            text-decoration: none;
-            font-size: 18px;
-        }
-
+        
+        /* Camera Modal */
         #cameraModal {
             display: none;
             position: fixed;
@@ -133,96 +98,180 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.8);
+            background: rgba(0,0,0,0.9);
             z-index: 1000;
             justify-content: center;
             align-items: center;
         }
-
+        
         .modal-content {
-            background: #fff;
-            padding: 20px;
-            border-radius: 10px;
-            text-align: center;
-            width: 90%;
+            width: 95%;
             max-width: 400px;
+            background: #fff;
+            border-radius: 12px;
+            overflow: hidden;
         }
-
+        
+        .video-container {
+            width: 100%;
+            background: #000;
+        }
+        
         #cameraVideo {
             width: 100%;
-            height: auto;
-            max-height: 70vh;
-            object-fit: cover;
-            border-radius: 10px;
+            display: block;
         }
-
-        button {
-            padding: 10px 20px;
+        
+        /* Knoppen */
+        .btn {
+            display: inline-block;
+            padding: 12px 20px;
             font-size: 16px;
-            cursor: pointer;
             border: none;
-            border-radius: 5px;
-            margin: 5px;
-        }
-
-        .btn-primary {
-            background-color: #4CAF50;
-            color: white;
-        }
-
-        .btn-danger {
-            background-color: #ff4444;
-            color: white;
-        }
-
-        textarea {
+            border-radius: 8px;
+            cursor: pointer;
+            text-align: center;
             width: 100%;
-            padding: 10px;
-            margin: 10px 0;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            min-height: 60px;
-            font-family: Arial, sans-serif;
+            margin-top: 10px;
+        }
+        
+        .btn-primary {
+            background: #3897f0;
+            color: white;
+        }
+        
+        .btn-danger {
+            background: #ed4956;
+            color: white;
+        }
+        
+        /* Navigatie */
+        .navbar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            background: #000;
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+            z-index: 10;
+        }
+        
+        .navbar a {
+            color: #fff;
+            text-decoration: none;
+            font-size: 14px;
+            padding: 8px 12px;
+        }
+        
+        /* Loading state */
+        .loading {
+            padding: 20px;
+            text-align: center;
+            color: #fff;
         }
     </style>
 </head>
 <body>
     <header>SportBuddy</header>
-
+    
     <div class="container">
-        <button onclick="openCameraModal()" class="btn-primary">
-            Start Camera
+        <button id="openCamera" class="btn btn-primary">
+            📷 Nieuwe Post Maken
         </button>
-
-        <!-- Voorbeeld posts -->
+        
+        <!-- Voorbeeld post -->
         <div class="card">
             <div class="card-image-container">
-                <img src="https://via.placeholder.com/600x800" alt="Marathon">
+                <img src="https://via.placeholder.com/600x600/3897f0/ffffff?text=Sport" alt="Voorbeeld">
             </div>
             <div class="card-content">
-                <h3>David Martinez</h3>
-                <p>Just finished the marathon!</p>
+                <h3>David</h3>
+                <p>Net een nieuwe personal record gehaald! 💪</p>
                 <div class="card-time">2 uur geleden</div>
             </div>
         </div>
-
-        <!-- Posts worden hier toegevoegd -->
+        
+        <!-- Posts worden hier geladen -->
     </div>
-
+    
+    <!-- Camera Modal -->
     <div id="cameraModal">
         <div class="modal-content">
-            <h2>Maak een Foto</h2>
-            <video id="cameraVideo" autoplay playsinline></video>
-            <button id="captureButton" class="btn-primary">Neem Foto</button>
-            <button onclick="closeCameraModal()" class="btn-danger">Sluiten</button>
+            <div class="video-container">
+                <video id="cameraVideo" autoplay playsinline></video>
+            </div>
+            <button id="captureButton" class="btn btn-primary">Foto Maken</button>
+            <button id="closeCamera" class="btn btn-danger">Annuleren</button>
         </div>
     </div>
-
-    <div class="navbar">
-        <a href="#">Home</a>
-        <a href="#">Feed</a>
-        <a href="#">Profile</a>
-        <a href="#">Settings</a>
-    </div>
+    
+    <!-- Navigatie -->
+    <nav class="navbar">
+        <a href="#">🏠 Home</a>
+        <a href="#">🔍 Ontdek</a>
+        <a href="#">➕ Post</a>
+        <a href="#">👤 Profiel</a>
+    </nav>
+    
+    <script>
+        // Basis camera functionaliteit
+        let videoStream = null;
+        
+        document.getElementById('openCamera').addEventListener('click', async () => {
+            const modal = document.getElementById('cameraModal');
+            modal.style.display = 'flex';
+            
+            try {
+                // Probeer achterkant camera eerst
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'environment' },
+                    audio: false
+                }).catch(async () => {
+                    // Fallback naar voorkant camera
+                    return await navigator.mediaDevices.getUserMedia({
+                        video: { facingMode: 'user' },
+                        audio: false
+                    });
+                });
+                
+                const video = document.getElementById('cameraVideo');
+                video.srcObject = videoStream;
+                video.play();
+                
+            } catch (error) {
+                alert('Kon camera niet starten: ' + error.message);
+                modal.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('closeCamera').addEventListener('click', () => {
+            const modal = document.getElementById('cameraModal');
+            modal.style.display = 'none';
+            
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+        });
+        
+        document.getElementById('captureButton').addEventListener('click', () => {
+            const video = document.getElementById('cameraVideo');
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Toon preview (simpele implementatie)
+            const photoData = canvas.toDataURL('image/jpeg');
+            alert('Foto gemaakt! In een echte app zou je hier een preview tonen.');
+            
+            // Sluit camera
+            document.getElementById('closeCamera').click();
+        });
+    </script>
 </body>
 </html>
