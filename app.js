@@ -6,22 +6,48 @@ function openCameraModal() {
     modal.style.display = 'flex';
 
     const videoElement = document.getElementById('cameraVideo');
+    
+    // Stop eventuele bestaande stream
+    if (videoStream) {
+        videoStream.getTracks().forEach(track => track.stop());
+    }
 
-    navigator.mediaDevices.getUserMedia({ 
-        video: { 
-            facingMode: 'environment',
+    // Probeer eerst achterkant camera
+    const constraints = {
+        video: {
             width: { ideal: 1280 },
-            height: { ideal: 720 }
-        } 
-    })
-    .then((stream) => {
-        videoStream = stream;
-        videoElement.srcObject = stream;
-    })
-    .catch((error) => {
-        console.error('Camera toegang geweigerd:', error);
-        alert('Camera toegang geweigerd. Controleer je instellingen.');
-    });
+            height: { ideal: 720 },
+            facingMode: { exact: "environment" }
+        }
+    };
+
+    navigator.mediaDevices.getUserMedia(constraints)
+        .then((stream) => {
+            videoStream = stream;
+            videoElement.srcObject = stream;
+            videoElement.onloadedmetadata = () => {
+                videoElement.play();
+            };
+        })
+        .catch((error) => {
+            console.log('Achterkant camera niet beschikbaar, probeer voorkant:', error);
+            
+            // Probeer met voorkant camera
+            constraints.video.facingMode = { exact: "user" };
+            return navigator.mediaDevices.getUserMedia(constraints);
+        })
+        .then((stream) => {
+            videoStream = stream;
+            videoElement.srcObject = stream;
+            videoElement.onloadedmetadata = () => {
+                videoElement.play();
+            };
+        })
+        .catch((error) => {
+            console.error('Geen camera toegang:', error);
+            alert('Kon geen camera starten. Controleer toestemmingen en probeer opnieuw.');
+            closeCameraModal();
+        });
 }
 
 function closeCameraModal() {
@@ -30,13 +56,13 @@ function closeCameraModal() {
 
     if (videoStream) {
         videoStream.getTracks().forEach(track => track.stop());
+        videoStream = null;
     }
 }
 
 // Post functies
 function confirmPost(photoData) {
-    const modal = document.getElementById('cameraModal');
-    modal.style.display = 'none';
+    closeCameraModal();
 
     const previewModal = document.createElement('div');
     previewModal.style.position = 'fixed';
@@ -57,6 +83,7 @@ function confirmPost(photoData) {
     img.src = photoData;
     img.style.maxWidth = '100%';
     img.style.maxHeight = '60vh';
+    img.style.objectFit = 'contain';
     img.style.borderRadius = '10px';
     previewContent.appendChild(img);
 
@@ -227,17 +254,19 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.getElementById('captureButton').addEventListener('click', () => {
         const video = document.getElementById('cameraVideo');
-        const canvas = document.createElement('canvas');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
         
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
-        // Compressie en kwaliteit instellingen
-        const photoData = canvas.toDataURL('image/jpeg', 0.8);
-        confirmPost(photoData);
-        closeCameraModal();
+        if (video.readyState === HTMLMediaElement.HAVE_ENOUGH_DATA) {
+            const canvas = document.createElement('canvas');
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const photoData = canvas.toDataURL('image/jpeg', 0.8);
+            confirmPost(photoData);
+        } else {
+            alert('Camera is nog niet klaar. Wacht even en probeer opnieuw.');
+        }
     });
 });
-console.log("app.js geladen");

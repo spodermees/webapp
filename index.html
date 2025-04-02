@@ -21,7 +21,7 @@
             padding: 0;
             background-color: #f4f4f4;
             color: #333;
-            padding-bottom: 60px; /* Ruimte voor navbar */
+            padding-bottom: 60px;
         }
 
         header {
@@ -52,7 +52,6 @@
             width: 100%;
         }
 
-        /* Responsieve afbeeldingen */
         .card-image-container {
             width: 100%;
             position: relative;
@@ -64,13 +63,13 @@
             display: block;
         }
 
-        /* Mobiel (standaard) */
+        /* Mobiele weergave */
         .card-image-container img {
             max-height: 70vh;
             object-fit: contain;
         }
 
-        /* Desktop */
+        /* Desktop weergave */
         @media (min-width: 768px) {
             .card-image-container {
                 height: 500px;
@@ -127,10 +126,6 @@
             font-size: 18px;
         }
 
-        .navbar a:hover {
-            text-decoration: underline;
-        }
-
         #cameraModal {
             display: none;
             position: fixed;
@@ -151,6 +146,14 @@
             text-align: center;
             width: 90%;
             max-width: 400px;
+        }
+
+        #cameraVideo {
+            width: 100%;
+            height: auto;
+            max-height: 70vh;
+            object-fit: cover;
+            border-radius: 10px;
         }
 
         button {
@@ -203,21 +206,13 @@
             </div>
         </div>
 
-        <div class="card">
-            <div class="card-content">
-                <h3>Jessica Moore</h3>
-                <p>Amazing job! 👏</p>
-                <div class="card-time">1 dag geleden</div>
-            </div>
-        </div>
-
         <!-- Posts worden hier toegevoegd -->
     </div>
 
     <div id="cameraModal">
         <div class="modal-content">
             <h2>Maak een Foto</h2>
-            <video id="cameraVideo" autoplay playsinline style="width: 100%; border-radius: 10px;"></video>
+            <video id="cameraVideo" autoplay playsinline></video>
             <button id="captureButton" class="btn-primary">Neem Foto</button>
             <button onclick="closeCameraModal()" class="btn-danger">Sluiten</button>
         </div>
