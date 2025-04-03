@@ -41,10 +41,21 @@ function openCameraModal() {
 
 function closeCameraModal() {
     const modal = document.getElementById('cameraModal');
-    modal.style.display = 'none';
+    if (modal) {
+        modal.style.display = 'none';
+    }
 
+    // Stop de camerastream
     if (videoStream) {
         videoStream.getTracks().forEach(track => track.stop());
+        videoStream = null; // Reset de stream
+    }
+}
+
+function closePreviewModal() {
+    const previewModal = document.getElementById('previewModal');
+    if (previewModal) {
+        previewModal.style.display = 'none';
     }
 }
 
@@ -298,3 +309,4 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 window.openCameraModal = openCameraModal;
+window.closeCameraModal = closeCameraModal;
