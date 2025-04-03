@@ -4,7 +4,7 @@ let videoStream;
 const firebaseConfig = {
     apiKey: "AIzaSyBGwwEsBMQADESSoTvo0Tsq67-HUl9dfjs",
     authDomain: "sportbuddy-d830f.firebaseapp.com",
-    databaseURL: "https://sportbuddy-d830f-default-rtdb.europe-west1.firebasedatabase.app/", // Correcte URL
+    databaseURL: "https://sportbuddy-d830f-default-rtdb.europe-west1.firebasedatabase.app",
     projectId: "sportbuddy-d830f",
     storageBucket: "sportbuddy-d830f.appspot.com",
     messagingSenderId: "392455948044",
