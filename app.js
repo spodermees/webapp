@@ -1,15 +1,15 @@
 let videoStream;
 
 // Firebase-configuratie
-const firebaseConfig = {
-    apiKey: "AIzaSyBGwwEsBMQADESSoTvo0Tsq67-HUl9dfjs",
-    authDomain: "sportbuddy-d830f.firebaseapp.com",
-    databaseURL: "https://sportbuddy-d830f-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "sportbuddy-d830f",
-    storageBucket: "sportbuddy-d830f.appspot.com",
-    messagingSenderId: "392455948044",
-    appId: "1:392455948044:web:bacedecd2f7db73d606b29"
-};
+// const firebaseConfig = {
+//     apiKey: "AIzaSyBGwwEsBMQADESSoTvo0Tsq67-HUl9dfjs",
+//     authDomain: "sportbuddy-d830f.firebaseapp.com",
+//     databaseURL: "https://sportbuddy-d830f-default-rtdb.europe-west1.firebasedatabase.app",
+//     projectId: "sportbuddy-d830f",
+//     storageBucket: "sportbuddy-d830f.appspot.com",
+//     messagingSenderId: "392455948044",
+//     appId: "1:392455948044:web:bacedecd2f7db73d606b29"
+// };
 
 // Initialiseer Firebase
 firebase.initializeApp(firebaseConfig);
@@ -262,7 +262,24 @@ function handleAuthState(user) {
 }
 
 // Event listeners
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
+    // Firebase configuratie
+    const firebaseConfig = {
+        apiKey: "AIzaSyBGwwEsBMQADESSoTvo0Tsq67-HUl9dfjs",
+        authDomain: "sportbuddy-d830f.firebaseapp.com",
+        databaseURL: "https://sportbuddy-d830f-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "sportbuddy-d830f",
+        storageBucket: "sportbuddy-d830f.appspot.com",
+        messagingSenderId: "392455948044",
+        appId: "1:392455948044:web:bacedecd2f7db73d606b29"
+    };
+    
+    // Initialize Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+    const database = firebase.database();
+    
+    // Rest van je code...
     // Auth state observer
     auth.onAuthStateChanged(handleAuthState);
 
