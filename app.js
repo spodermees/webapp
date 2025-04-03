@@ -22,21 +22,21 @@ function openCameraModal() {
 
     const videoElement = document.getElementById('cameraVideo');
 
-    navigator.mediaDevices.getUserMedia({ 
-        video: { 
-            facingMode: 'user', 
+    navigator.mediaDevices.getUserMedia({
+        video: {
+            facingMode: 'user',
             width: { ideal: 1280 },
             height: { ideal: 720 }
-        } 
+        }
     })
-    .then((stream) => {
-        videoStream = stream;
-        videoElement.srcObject = stream;
-    })
-    .catch((error) => {
-        console.error('Camera toegang geweigerd:', error);
-        alert('Camera toegang geweigerd. Controleer je instellingen.');
-    });
+        .then((stream) => {
+            videoStream = stream;
+            videoElement.srcObject = stream;
+        })
+        .catch((error) => {
+            console.error('Camera toegang geweigerd:', error);
+            alert('Camera toegang geweigerd. Controleer je instellingen.');
+        });
 }
 
 function closeCameraModal() {
@@ -123,7 +123,7 @@ function createPost(photoData, caption) {
     // Afbeelding container
     const imageContainer = document.createElement('div');
     imageContainer.className = 'card-image-container';
-    
+
     const img = document.createElement('img');
     img.src = photoData;
     img.alt = 'Sport moment';
@@ -133,20 +133,20 @@ function createPost(photoData, caption) {
     // Content
     const contentDiv = document.createElement('div');
     contentDiv.className = 'card-content';
-    
+
     const username = document.createElement('h3');
     username.textContent = 'Jij';
     contentDiv.appendChild(username);
-    
+
     const captionEl = document.createElement('p');
     captionEl.textContent = caption;
     contentDiv.appendChild(captionEl);
-    
+
     const timeEl = document.createElement('div');
     timeEl.className = 'card-time';
     timeEl.textContent = 'Zojuist';
     contentDiv.appendChild(timeEl);
-    
+
     postCard.appendChild(contentDiv);
 
     // Voeg toe na de camera knop
@@ -230,11 +230,11 @@ function formatTime(timestamp) {
     const now = new Date();
     const postDate = new Date(timestamp);
     const diff = now - postDate;
-    
+
     const minutes = Math.floor(diff / (1000 * 60));
     const hours = Math.floor(diff / (1000 * 60 * 60));
     const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-    
+
     if (minutes < 1) return 'Zojuist';
     if (minutes < 60) return `${minutes} minuten geleden`;
     if (hours < 24) return `${hours} uur geleden`;
@@ -246,7 +246,7 @@ function clearPhotos() {
     if (confirm('Weet je zeker dat je alle posts wilt verwijderen?')) {
         localStorage.removeItem('sportbuddy_posts');
         document.querySelectorAll('.container .card').forEach(card => {
-            if (!card.querySelector('h3') || 
+            if (!card.querySelector('h3') ||
                 !['David Martinez', 'Jessica Moore', 'Matt Johnson'].includes(card.querySelector('h3').textContent)) {
                 card.remove();
             }
@@ -271,15 +271,16 @@ function registerUser(email, password) {
 function loginUser(email, password) {
     firebase.auth().signInWithEmailAndPassword(email, password)
         .then((userCredential) => {
-            // Inloggen succesvol
             const user = userCredential.user;
+            console.log("Ingelogde gebruiker:", user);
             alert('Inloggen succesvol!');
             localStorage.setItem('loggedInUser', email);
-            showApp(); // Toon de rest van de app
+            showApp();
         })
         .catch((error) => {
-            // Fout bij inloggen
-            console.error('Fout bij inloggen:', error);
+            console.error('Volledige fout:', error);
+            console.log('Foutcode:', error.code);
+            console.log('Foutbericht:', error.message);
             alert('Inloggen mislukt: ' + error.message);
         });
 }
@@ -287,16 +288,16 @@ function loginUser(email, password) {
 // Initialisatie
 document.addEventListener('DOMContentLoaded', () => {
     loadPosts();
-    
+
     document.getElementById('captureButton').addEventListener('click', () => {
         const video = document.getElementById('cameraVideo');
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-        
+
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-        
+
         // Compressie en kwaliteit instellingen
         const photoData = canvas.toDataURL('image/jpeg', 0.8);
         confirmPost(photoData);
