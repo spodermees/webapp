@@ -14,6 +14,7 @@ const firebaseConfig = {
 // Initialiseer Firebase
 firebase.initializeApp(firebaseConfig);
 const database = firebase.database();
+const auth = firebase.auth();
 
 // Camera functies
 function openCameraModal() {
@@ -29,14 +30,14 @@ function openCameraModal() {
             height: { ideal: 720 }
         }
     })
-        .then((stream) => {
-            videoStream = stream;
-            videoElement.srcObject = stream;
-        })
-        .catch((error) => {
-            console.error('Camera toegang geweigerd:', error);
-            alert('Camera toegang geweigerd. Controleer je instellingen.');
-        });
+    .then((stream) => {
+        videoStream = stream;
+        videoElement.srcObject = stream;
+    })
+    .catch((error) => {
+        console.error('Camera toegang geweigerd:', error);
+        alert('Camera toegang geweigerd. Controleer je instellingen.');
+    });
 }
 
 function closeCameraModal() {
@@ -45,17 +46,9 @@ function closeCameraModal() {
         modal.style.display = 'none';
     }
 
-    // Stop de camerastream
     if (videoStream) {
         videoStream.getTracks().forEach(track => track.stop());
-        videoStream = null; // Reset de stream
-    }
-}
-
-function closePreviewModal() {
-    const previewModal = document.getElementById('previewModal');
-    if (previewModal) {
-        previewModal.style.display = 'none';
+        videoStream = null;
     }
 }
 
@@ -65,6 +58,7 @@ function confirmPost(photoData) {
     modal.style.display = 'none';
 
     const previewModal = document.createElement('div');
+    previewModal.id = 'previewModal';
     previewModal.style.position = 'fixed';
     previewModal.style.top = '0';
     previewModal.style.left = '0';
@@ -93,6 +87,7 @@ function confirmPost(photoData) {
     const buttonContainer = document.createElement('div');
     buttonContainer.style.display = 'flex';
     buttonContainer.style.justifyContent = 'space-between';
+    buttonContainer.style.marginTop = '10px';
 
     const cancelBtn = document.createElement('button');
     cancelBtn.className = 'btn-danger';
@@ -120,7 +115,6 @@ function createPost(photoData, caption) {
     const postCard = document.createElement('div');
     postCard.className = 'card';
 
-    // Afbeelding container
     const imageContainer = document.createElement('div');
     imageContainer.className = 'card-image-container';
 
@@ -130,7 +124,6 @@ function createPost(photoData, caption) {
     imageContainer.appendChild(img);
     postCard.appendChild(imageContainer);
 
-    // Content
     const contentDiv = document.createElement('div');
     contentDiv.className = 'card-content';
 
@@ -149,7 +142,6 @@ function createPost(photoData, caption) {
 
     postCard.appendChild(contentDiv);
 
-    // Voeg toe na de camera knop
     const cameraBtn = document.querySelector('.container button');
     if (cameraBtn) {
         cameraBtn.insertAdjacentElement('afterend', postCard);
@@ -160,69 +152,64 @@ function createPost(photoData, caption) {
     savePost(photoData, caption);
 }
 
-// Opslag functies
 function savePost(photoData, caption) {
-    const postId = firebase.database().ref().child('posts').push().key;
+    const postId = database.ref().child('posts').push().key;
     const post = {
         photo: photoData,
         caption: caption,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        userId: auth.currentUser?.uid || 'anonymous'
     };
 
-    firebase.database().ref('posts/' + postId).set(post)
-        .then(() => {
-            console.log('Post opgeslagen in Firebase.');
-        })
-        .catch(error => {
-            console.error('Fout bij opslaan van post:', error);
-        });
+    database.ref('posts/' + postId).set(post)
+    .then(() => console.log('Post opgeslagen in Firebase.'))
+    .catch(error => console.error('Fout bij opslaan van post:', error));
 }
 
 function loadPosts() {
-    firebase.database().ref('posts').once('value')
-        .then(snapshot => {
-            const posts = snapshot.val();
-            if (posts) {
-                const container = document.querySelector('.container');
-                Object.values(posts).forEach(post => {
-                    const postCard = document.createElement('div');
-                    postCard.className = 'card';
+    database.ref('posts').once('value')
+    .then(snapshot => {
+        const posts = snapshot.val();
+        if (posts) {
+            const container = document.querySelector('.container');
+            Object.entries(posts).forEach(([id, post]) => {
+                if (document.getElementById(`post-${id}`)) return;
 
-                    // Afbeelding
-                    const imageContainer = document.createElement('div');
-                    imageContainer.className = 'card-image-container';
+                const postCard = document.createElement('div');
+                postCard.className = 'card';
+                postCard.id = `post-${id}`;
 
-                    const img = document.createElement('img');
-                    img.src = post.photo;
-                    img.alt = 'Sport moment';
-                    imageContainer.appendChild(img);
-                    postCard.appendChild(imageContainer);
+                const imageContainer = document.createElement('div');
+                imageContainer.className = 'card-image-container';
 
-                    // Content
-                    const contentDiv = document.createElement('div');
-                    contentDiv.className = 'card-content';
+                const img = document.createElement('img');
+                img.src = post.photo;
+                img.alt = 'Sport moment';
+                imageContainer.appendChild(img);
+                postCard.appendChild(imageContainer);
 
-                    const username = document.createElement('h3');
-                    username.textContent = 'Jij';
-                    contentDiv.appendChild(username);
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'card-content';
 
-                    const captionEl = document.createElement('p');
-                    captionEl.textContent = post.caption;
-                    contentDiv.appendChild(captionEl);
+                const username = document.createElement('h3');
+                username.textContent = post.userId === auth.currentUser?.uid ? 'Jij' : 'Andere gebruiker';
+                contentDiv.appendChild(username);
 
-                    const timeEl = document.createElement('div');
-                    timeEl.className = 'card-time';
-                    timeEl.textContent = formatTime(post.timestamp);
-                    contentDiv.appendChild(timeEl);
+                const captionEl = document.createElement('p');
+                captionEl.textContent = post.caption;
+                contentDiv.appendChild(captionEl);
 
-                    postCard.appendChild(contentDiv);
-                    container.appendChild(postCard);
-                });
-            }
-        })
-        .catch(error => {
-            console.error('Fout bij laden van posts:', error);
-        });
+                const timeEl = document.createElement('div');
+                timeEl.className = 'card-time';
+                timeEl.textContent = formatTime(post.timestamp);
+                contentDiv.appendChild(timeEl);
+
+                postCard.appendChild(contentDiv);
+                container.appendChild(postCard);
+            });
+        }
+    })
+    .catch(error => console.error('Fout bij laden van posts:', error));
 }
 
 // Hulp functies
@@ -242,163 +229,103 @@ function formatTime(timestamp) {
     return `${days} dagen geleden`;
 }
 
-function clearPhotos() {
-    if (confirm('Weet je zeker dat je alle posts wilt verwijderen?')) {
-        localStorage.removeItem('sportbuddy_posts');
-        document.querySelectorAll('.container .card').forEach(card => {
-            if (!card.querySelector('h3') ||
-                !['David Martinez', 'Jessica Moore', 'Matt Johnson'].includes(card.querySelector('h3').textContent)) {
-                card.remove();
-            }
-        });
-    }
-}
-
 function registerUser(email, password) {
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            // Registratie succesvol
-            const user = userCredential.user;
-            alert('Registratie succesvol!');
-        })
-        .catch((error) => {
-            // Fout bij registratie
-            console.error('Fout bij registratie:', error);
-            alert('Registratie mislukt: ' + error.message);
+    auth.createUserWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        alert('Registratie succesvol!');
+        // Optioneel: gebruikersgegevens opslaan in database
+        const user = userCredential.user;
+        database.ref('users/' + user.uid).set({
+            email: user.email,
+            createdAt: new Date().toISOString()
         });
+    })
+    .catch((error) => {
+        console.error('Fout bij registratie:', error);
+        alert('Registratie mislukt: ' + error.message);
+    });
 }
 
 function loginUser(email, password) {
-    firebase.auth().signInWithEmailAndPassword(email, password)
-        .then((userCredential) => {
-            const user = userCredential.user;
-            console.log("Ingelogde gebruiker:", user);
-            alert('Inloggen succesvol!');
-            localStorage.setItem('loggedInUser', email);
-            showApp();
-        })
-        .catch((error) => {
-            console.error('Volledige fout:', error);
-            console.log('Foutcode:', error.code);
-            console.log('Foutbericht:', error.message);
-            alert('Inloggen mislukt: ' + error.message);
-        });
+    auth.signInWithEmailAndPassword(email, password)
+    .then((userCredential) => {
+        console.log("Ingelogde gebruiker:", userCredential.user);
+    })
+    .catch((error) => {
+        console.error('Login error:', error);
+        let errorMessage = 'Inloggen mislukt.';
+        switch(error.code) {
+            case 'auth/wrong-password':
+                errorMessage = 'Ongeldig wachtwoord.';
+                break;
+            case 'auth/user-not-found':
+                errorMessage = 'Gebruiker niet gevonden.';
+                break;
+            case 'auth/network-request-failed':
+                errorMessage = 'Netwerkfout. Controleer je internetverbinding.';
+                break;
+        }
+        alert(errorMessage);
+    });
 }
 
 // Initialisatie
 document.addEventListener('DOMContentLoaded', () => {
-    loadPosts();
+    // Controleer auth state
+    auth.onAuthStateChanged((user) => {
+        const loginPopup = document.getElementById('loginPopup');
+        if (user) {
+            // Gebruiker is ingelogd
+            loginPopup.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            loadPosts();
+        } else {
+            // Gebruiker is niet ingelogd
+            loginPopup.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+    });
 
+    // Event listeners
     document.getElementById('captureButton').addEventListener('click', () => {
         const video = document.getElementById('cameraVideo');
         const canvas = document.createElement('canvas');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
-
+        
         const ctx = canvas.getContext('2d');
         ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        // Compressie en kwaliteit instellingen
+        
         const photoData = canvas.toDataURL('image/jpeg', 0.8);
         confirmPost(photoData);
         closeCameraModal();
     });
 
-    const loginPopup = document.getElementById('loginPopup');
-    const loginButton = document.getElementById('loginButton');
-    const loginEmail = document.getElementById('loginEmail');
-    const loginPassword = document.getElementById('loginPassword');
-
-    // Verberg de rest van de app totdat de gebruiker is ingelogd
-    document.body.style.overflow = 'hidden';
-
-    loginButton.addEventListener('click', () => {
-        const email = loginEmail.value.trim();
-        const password = loginPassword.value.trim();
+    document.getElementById('loginButton').addEventListener('click', () => {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value.trim();
 
         if (!email || !password) {
             alert('Vul je email en wachtwoord in.');
             return;
         }
 
-        // Simuleer een login (vervang dit met Firebase-authenticatie als nodig)
         loginUser(email, password);
     });
 
-    function loginUser(email, password) {
-        const userId = email.replace('.', '_'); // Firebase ondersteunt geen punten in sleutels
-        firebase.database().ref('users/' + userId).once('value')
-            .then(snapshot => {
-                if (snapshot.exists()) {
-                    const userData = snapshot.val();
-                    if (userData.password === password) {
-                        alert('Inloggen succesvol!');
-                        localStorage.setItem('loggedInUser', email);
-                        loginPopup.style.display = 'none';
-                        document.body.style.overflow = 'auto'; // Herstel scrollen
-                    } else {
-                        alert('Ongeldig wachtwoord.');
-                    }
-                } else {
-                    alert('Gebruiker niet gevonden.');
-                }
-            })
-            .catch(error => {
-                console.error('Fout bij inloggen:', error);
-            });
-    }
-});
-
-document.addEventListener('DOMContentLoaded', () => {
-    const loginPopup = document.getElementById('loginPopup');
-    const loginButton = document.getElementById('loginButton');
-    const loginEmail = document.getElementById('loginEmailPopup'); // Aangepaste id
-    const loginPassword = document.getElementById('loginPasswordPopup'); // Aangepaste id
-
-    // Verberg de rest van de app totdat de gebruiker is ingelogd
-    document.body.style.overflow = 'hidden';
-
-    loginButton.addEventListener('click', () => {
-        const email = loginEmail.value.trim();
-        const password = loginPassword.value.trim();
+    document.getElementById('registerButton')?.addEventListener('click', () => {
+        const email = document.getElementById('registerEmail').value.trim();
+        const password = document.getElementById('registerPassword').value.trim();
 
         if (!email || !password) {
             alert('Vul je email en wachtwoord in.');
             return;
         }
 
-        // Simuleer een login (vervang dit met Firebase-authenticatie als nodig)
-        loginUser(email, password);
+        registerUser(email, password);
     });
 });
 
-document.addEventListener('DOMContentLoaded', () => {
-    const loginPopup = document.getElementById('loginPopup');
-
-    // Controleer of de gebruiker al is ingelogd
-    const loggedInUser = localStorage.getItem('loggedInUser');
-    if (loggedInUser) {
-        loginPopup.style.display = 'none';
-        document.body.style.overflow = 'auto'; // Herstel scrollen
-        return;
-    }
-
-    // Toon de login-popup als de gebruiker niet is ingelogd
-    document.body.style.overflow = 'hidden';
-});
-
-firebase.auth().onAuthStateChanged((user) => {
-    const loginPopup = document.getElementById('loginPopup');
-    if (user) {
-        // Gebruiker is ingelogd
-        loginPopup.style.display = 'none';
-        document.body.style.overflow = 'auto'; // Herstel scrollen
-    } else {
-        // Gebruiker is niet ingelogd
-        loginPopup.style.display = 'flex';
-        document.body.style.overflow = 'hidden';
-    }
-});
-
+// Globale functies
 window.openCameraModal = openCameraModal;
 window.closeCameraModal = closeCameraModal;
