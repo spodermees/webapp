@@ -34,6 +34,10 @@
             font-weight: bold;
         }
 
+        #appContent {
+            display: none;
+        }
+
         .container {
             display: flex;
             flex-direction: column;
@@ -117,7 +121,7 @@
             width: 100%;
             background-color: #000;
             color: #fff;
-            display: flex;
+            display: none; /* Verborgen standaard */
             justify-content: space-around;
             padding: 10px 0;
         }
@@ -207,34 +211,41 @@
             min-height: 60px;
             font-family: Arial, sans-serif;
         }
+
+        #loginButton[disabled] {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 
 <body>
     <header>SportBuddy</header>
 
-    <div class="container">
-        <button onclick="openCameraModal()" class="btn-primary">
-            Start Camera
-        </button>
+    <div id="appContent">
+        <div class="container">
+            <button onclick="openCameraModal()" class="btn-primary">
+                Start Camera
+            </button>
 
-        <!-- Voorbeeld posts -->
-        <div class="card">
-            <div class="card-image-container">
-                <!-- <img src="https://via.placeholder.com/600x800" alt="Marathon"> -->
+            <!-- Voorbeeld posts -->
+            <div class="card">
+                <div class="card-image-container">
+                    <!-- <img src="https://via.placeholder.com/600x800" alt="Marathon"> -->
+                </div>
+                <div class="card-content">
+                    <h3>David Martinez</h3>
+                    <p>Just finished the marathon!</p>
+                    <div class="card-time">2 uur geleden</div>
+                </div>
             </div>
-            <div class="card-content">
-                <h3>David Martinez</h3>
-                <p>Just finished the marathon!</p>
-                <div class="card-time">2 uur geleden</div>
-            </div>
+
+            <!-- Posts worden hier toegevoegd -->
         </div>
-
-        <!-- Posts worden hier toegevoegd -->
     </div>
 
     <!-- Camera Modal -->
-    <div id="cameraModal" style="display: none;">
+    <div id="cameraModal">
         <div class="modal-content">
             <h2>Maak een Foto</h2>
             <video id="cameraVideo" autoplay playsinline></video>
@@ -247,24 +258,21 @@
     <div id="previewModal">
         <div class="modal-content">
             <h2>Preview</h2>
-            <img id="previewImage">
+            <img id="previewImage" src="#" alt="Preview">
             <textarea id="postCaption" placeholder="Voeg een beschrijving toe..."></textarea>
-            <button id="confirmPost" class="btn-primary">Posten</button>
-            <button onclick="closePreviewModal()" class="btn-danger">Annuleren</button>
+            <div style="display: flex; justify-content: space-between;">
+                <button id="confirmPost" class="btn-primary">Posten</button>
+                <button onclick="closePreviewModal()" class="btn-danger">Annuleren</button>
+            </div>
         </div>
     </div>
 
-    <div id="loginPopup"
-        style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; z-index: 1000;">
-        <form
-            style="background: white; padding: 20px; border-radius: 10px; text-align: center; width: 90%; max-width: 400px;">
+    <div id="loginPopup" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; z-index: 1000;">
+        <form id="loginForm" style="background: white; padding: 20px; border-radius: 10px; text-align: center; width: 90%; max-width: 400px;">
             <h2>Inloggen</h2>
-            <input type="email" id="loginEmailPopup" placeholder="Email" autocomplete="email"
-                style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
-            <input type="password" id="loginPasswordPopup" placeholder="Wachtwoord" autocomplete="current-password"
-                style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
-            <button type="submit" id="loginButton"
-                style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 5px;">Inloggen</button>
+            <input type="email" id="loginEmailPopup" placeholder="Email" autocomplete="email" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <input type="password" id="loginPasswordPopup" placeholder="Wachtwoord" autocomplete="current-password" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <button type="submit" id="loginButton" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 5px;">Inloggen</button>
         </form>
     </div>
 
@@ -275,7 +283,7 @@
         <a href="#">Settings</a>
     </div>
 
-    <script type="module" src="app.js"></script>
+    <script src="app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>

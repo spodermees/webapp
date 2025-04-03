@@ -13,8 +13,16 @@ const firebaseConfig = {
 
 // Initialiseer Firebase
 firebase.initializeApp(firebaseConfig);
-const database = firebase.database();
 const auth = firebase.auth();
+const database = firebase.database();
+
+// DOM elementen
+const loginPopup = document.getElementById('loginPopup');
+const loginForm = loginPopup.querySelector('form');
+const loginEmail = document.getElementById('loginEmailPopup');
+const loginPassword = document.getElementById('loginPasswordPopup');
+const appContent = document.querySelector('.container');
+const navbar = document.querySelector('.navbar');
 
 // Camera functies
 function openCameraModal() {
@@ -54,60 +62,34 @@ function closeCameraModal() {
 
 // Post functies
 function confirmPost(photoData) {
-    const modal = document.getElementById('cameraModal');
-    modal.style.display = 'none';
-
-    const previewModal = document.createElement('div');
-    previewModal.id = 'previewModal';
-    previewModal.style.position = 'fixed';
-    previewModal.style.top = '0';
-    previewModal.style.left = '0';
-    previewModal.style.width = '100%';
-    previewModal.style.height = '100%';
-    previewModal.style.backgroundColor = 'rgba(0,0,0,0.8)';
-    previewModal.style.zIndex = '1000';
-    previewModal.style.display = 'flex';
-    previewModal.style.justifyContent = 'center';
-    previewModal.style.alignItems = 'center';
-
-    const previewContent = document.createElement('div');
-    previewContent.className = 'modal-content';
-
-    const img = document.createElement('img');
-    img.src = photoData;
-    img.style.maxWidth = '100%';
-    img.style.maxHeight = '60vh';
-    img.style.borderRadius = '10px';
-    previewContent.appendChild(img);
-
-    const captionInput = document.createElement('textarea');
-    captionInput.placeholder = 'Wat heb je gedaan?';
-    previewContent.appendChild(captionInput);
-
-    const buttonContainer = document.createElement('div');
-    buttonContainer.style.display = 'flex';
-    buttonContainer.style.justifyContent = 'space-between';
-    buttonContainer.style.marginTop = '10px';
-
-    const cancelBtn = document.createElement('button');
-    cancelBtn.className = 'btn-danger';
-    cancelBtn.textContent = 'Annuleren';
-    cancelBtn.onclick = () => document.body.removeChild(previewModal);
-    buttonContainer.appendChild(cancelBtn);
-
-    const postBtn = document.createElement('button');
-    postBtn.className = 'btn-primary';
-    postBtn.textContent = 'Posten';
-    postBtn.onclick = () => {
-        const caption = captionInput.value.trim() || 'Nieuwe sportprestatie!';
+    closeCameraModal();
+    
+    const previewModal = document.getElementById('previewModal');
+    const previewImage = document.getElementById('previewImage');
+    const postCaption = document.getElementById('postCaption');
+    const confirmPostBtn = document.getElementById('confirmPost');
+    
+    previewImage.src = photoData;
+    postCaption.value = '';
+    
+    // Verwijder oude event listeners
+    const newConfirmPostBtn = confirmPostBtn.cloneNode(true);
+    confirmPostBtn.parentNode.replaceChild(newConfirmPostBtn, confirmPostBtn);
+    
+    newConfirmPostBtn.onclick = () => {
+        const caption = postCaption.value.trim() || 'Nieuwe sportprestatie!';
         createPost(photoData, caption);
-        document.body.removeChild(previewModal);
+        closePreviewModal();
     };
-    buttonContainer.appendChild(postBtn);
+    
+    previewModal.style.display = 'flex';
+}
 
-    previewContent.appendChild(buttonContainer);
-    previewModal.appendChild(previewContent);
-    document.body.appendChild(previewModal);
+function closePreviewModal() {
+    const previewModal = document.getElementById('previewModal');
+    if (previewModal) {
+        previewModal.style.display = 'none';
+    }
 }
 
 function createPost(photoData, caption) {
@@ -140,8 +122,7 @@ function createPost(photoData, caption) {
     timeEl.textContent = 'Zojuist';
     contentDiv.appendChild(timeEl);
 
-    postCard.appendChild(contentDiv);
-
+    // Voeg toe na de camera knop
     const cameraBtn = document.querySelector('.container button');
     if (cameraBtn) {
         cameraBtn.insertAdjacentElement('afterend', postCard);
@@ -229,37 +210,31 @@ function formatTime(timestamp) {
     return `${days} dagen geleden`;
 }
 
-function registerUser(email, password) {
-    auth.createUserWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-        alert('Registratie succesvol!');
-        // Optioneel: gebruikersgegevens opslaan in database
-        const user = userCredential.user;
-        database.ref('users/' + user.uid).set({
-            email: user.email,
-            createdAt: new Date().toISOString()
-        });
-    })
-    .catch((error) => {
-        console.error('Fout bij registratie:', error);
-        alert('Registratie mislukt: ' + error.message);
-    });
-}
-
+// Authenticatie functies
 function loginUser(email, password) {
+    const loginButton = loginForm.querySelector('button');
+    const originalText = loginButton.textContent;
+    
+    loginButton.disabled = true;
+    loginButton.textContent = 'Inloggen...';
+
     auth.signInWithEmailAndPassword(email, password)
     .then((userCredential) => {
-        console.log("Ingelogde gebruiker:", userCredential.user);
+        console.log("Ingelogd als:", userCredential.user.email);
+        // Geen refresh nodig, onAuthStateChanged handelt de UI update
     })
     .catch((error) => {
         console.error('Login error:', error);
+        loginButton.disabled = false;
+        loginButton.textContent = originalText;
+        
         let errorMessage = 'Inloggen mislukt.';
         switch(error.code) {
             case 'auth/wrong-password':
-                errorMessage = 'Ongeldig wachtwoord.';
+                errorMessage = 'Ongeldig wachtwoord';
                 break;
             case 'auth/user-not-found':
-                errorMessage = 'Gebruiker niet gevonden.';
+                errorMessage = 'Gebruiker niet gevonden';
                 break;
             case 'auth/network-request-failed':
                 errorMessage = 'Netwerkfout. Controleer je internetverbinding.';
@@ -269,24 +244,43 @@ function loginUser(email, password) {
     });
 }
 
-// Initialisatie
+function handleAuthState(user) {
+    if (user) {
+        console.log('User is ingelogd:', user.email);
+        loginPopup.style.display = 'none';
+        appContent.style.display = 'block';
+        navbar.style.display = 'flex';
+        document.body.style.overflow = 'auto';
+        loadPosts();
+    } else {
+        console.log('User is niet ingelogd');
+        loginPopup.style.display = 'flex';
+        appContent.style.display = 'none';
+        navbar.style.display = 'none';
+        document.body.style.overflow = 'hidden';
+    }
+}
+
+// Event listeners
 document.addEventListener('DOMContentLoaded', () => {
-    // Controleer auth state
-    auth.onAuthStateChanged((user) => {
-        const loginPopup = document.getElementById('loginPopup');
-        if (user) {
-            // Gebruiker is ingelogd
-            loginPopup.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            loadPosts();
-        } else {
-            // Gebruiker is niet ingelogd
-            loginPopup.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+    // Auth state observer
+    auth.onAuthStateChanged(handleAuthState);
+
+    // Login form submit
+    loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value.trim();
+        
+        if (!email || !password) {
+            alert('Vul email en wachtwoord in');
+            return;
         }
+        
+        loginUser(email, password);
     });
 
-    // Event listeners
+    // Camera capture
     document.getElementById('captureButton').addEventListener('click', () => {
         const video = document.getElementById('cameraVideo');
         const canvas = document.createElement('canvas');
@@ -298,32 +292,10 @@ document.addEventListener('DOMContentLoaded', () => {
         
         const photoData = canvas.toDataURL('image/jpeg', 0.8);
         confirmPost(photoData);
-        closeCameraModal();
     });
 
-    document.getElementById('loginButton').addEventListener('click', () => {
-        const email = document.getElementById('loginEmail').value.trim();
-        const password = document.getElementById('loginPassword').value.trim();
-
-        if (!email || !password) {
-            alert('Vul je email en wachtwoord in.');
-            return;
-        }
-
-        loginUser(email, password);
-    });
-
-    document.getElementById('registerButton')?.addEventListener('click', () => {
-        const email = document.getElementById('registerEmail').value.trim();
-        const password = document.getElementById('registerPassword').value.trim();
-
-        if (!email || !password) {
-            alert('Vul je email en wachtwoord in.');
-            return;
-        }
-
-        registerUser(email, password);
-    });
+    // Preview modal cancel
+    document.querySelector('#previewModal .btn-danger').addEventListener('click', closePreviewModal);
 });
 
 // Globale functies
