@@ -218,14 +218,12 @@ function createPost(photoData, caption) {
     timeEl.textContent = 'Zojuist';
     contentDiv.appendChild(timeEl);
 
-    // Add after camera button
-    const cameraBtn = document.querySelector('.container button');
-    if (cameraBtn) {
-        cameraBtn.insertAdjacentElement('afterend', postCard);
-    } else {
-        container.prepend(postCard);
-    }
+    postCard.appendChild(contentDiv);
 
+    // Voeg de nieuwe post bovenaan de container toe
+    container.prepend(postCard);
+
+    // Sla de post op in Firebase
     savePost(photoData, caption);
 }
 
@@ -242,58 +240,75 @@ function savePost(photoData, caption) {
     .then(() => console.log('Post opgeslagen in Firebase.'))
     .catch(error => console.error('Fout bij opslaan van post:', error));
 }
-
 function loadPosts() {
     database.ref('posts').once('value')
     .then(snapshot => {
         const posts = snapshot.val();
         if (posts) {
-            // Clear existing posts (except the example)
-            document.querySelectorAll('.card').forEach(card => {
-                if (!card.querySelector('h3') || card.querySelector('h3').textContent !== 'David Martinez') {
+            // Clear existing posts (keep only the example post)
+            const cards = document.querySelectorAll('.card');
+            cards.forEach(card => {
+                const username = card.querySelector('h3');
+                if (!username || username.textContent !== 'David Martinez') {
                     card.remove();
                 }
             });
 
+            // Convert posts object to array and sort by timestamp (newest first)
+            const postsArray = Object.entries(posts)
+                .map(([id, post]) => ({ id, ...post }))
+                .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
             // Add posts from Firebase
-            Object.entries(posts).forEach(([id, post]) => {
-                if (document.getElementById(`post-${id}`)) return;
+            postsArray.forEach(post => {
+                if (document.getElementById(`post-${post.id}`)) return;
 
                 const postCard = document.createElement('div');
                 postCard.className = 'card';
-                postCard.id = `post-${id}`;
+                postCard.id = `post-${post.id}`;
 
+                // Image container
                 const imageContainer = document.createElement('div');
                 imageContainer.className = 'card-image-container';
-
                 const img = document.createElement('img');
                 img.src = post.photo;
                 img.alt = 'Sport moment';
                 imageContainer.appendChild(img);
                 postCard.appendChild(imageContainer);
 
+                // Content container
                 const contentDiv = document.createElement('div');
                 contentDiv.className = 'card-content';
-
+                
                 const username = document.createElement('h3');
                 username.textContent = post.userId === auth.currentUser?.uid ? 'Jij' : 'Andere gebruiker';
                 contentDiv.appendChild(username);
-
+                
                 const captionEl = document.createElement('p');
                 captionEl.textContent = post.caption;
                 contentDiv.appendChild(captionEl);
-
+                
                 const timeEl = document.createElement('div');
                 timeEl.className = 'card-time';
                 timeEl.textContent = formatTime(post.timestamp);
                 contentDiv.appendChild(timeEl);
 
                 postCard.appendChild(contentDiv);
-                container.appendChild(postCard);
+
+                // Insert after the camera button (before any other posts)
+                const cameraBtn = document.querySelector('.container button');
+                if (cameraBtn && cameraBtn.nextElementSibling) {
+                    cameraBtn.nextElementSibling.before(postCard);
+                } else {
+                    container.appendChild(postCard);
+                }
             });
         }
     })
-    .catch(error => console.error('Fout bij laden van posts:', error));
+    .catch(error => {
+        console.error('Fout bij laden van posts:', error);
+        alert('Fout bij het laden van posts. Probeer de pagina te verversen.');
+    });
 }
 
 // Helper function
