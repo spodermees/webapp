@@ -231,8 +231,8 @@
 
     <!-- Login Form -->
     <form id="loginForm">
-        <input type="email" id="loginEmail" placeholder="Email" autocomplete="email" style="width:100%;padding:10px;margin:10px 0;">
-        <input type="password" id="loginPassword" placeholder="Wachtwoord" autocomplete="current-password" style="width:100%;padding:10px;margin:10px 0;">
+        <input type="email" id="loginEmailForm" placeholder="Email" autocomplete="email" style="width:100%;padding:10px;margin:10px 0;">
+        <input type="password" id="loginPasswordForm" placeholder="Wachtwoord" autocomplete="current-password" style="width:100%;padding:10px;margin:10px 0;">
         <button id="loginBtn" style="width:100%;padding:10px;background:#000;color:#fff;border:none;">Inloggen</button>
     </form>
 
@@ -254,6 +254,15 @@
             <textarea id="postCaption" placeholder="Voeg een beschrijving toe..."></textarea>
             <button id="confirmPost" class="btn-primary">Posten</button>
             <button onclick="closePreviewModal()" class="btn-danger">Annuleren</button>
+        </div>
+    </div>
+
+    <div id="loginPopup" style="display: flex; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); justify-content: center; align-items: center; z-index: 1000;">
+        <div style="background: white; padding: 20px; border-radius: 10px; text-align: center; width: 90%; max-width: 400px;">
+            <h2>Inloggen</h2>
+            <input type="email" id="loginEmailPopup" placeholder="Email" autocomplete="email" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <input type="password" id="loginPasswordPopup" placeholder="Wachtwoord" autocomplete="current-password" style="width: 100%; padding: 10px; margin-bottom: 10px; border: 1px solid #ddd; border-radius: 5px;">
+            <button id="loginButton" style="width: 100%; padding: 10px; background: #4CAF50; color: white; border: none; border-radius: 5px;">Inloggen</button>
         </div>
     </div>
 

@@ -255,36 +255,32 @@ function clearPhotos() {
 }
 
 function registerUser(email, password) {
-    const userId = email.replace('.', '_'); // Firebase ondersteunt geen punten in sleutels
-    firebase.database().ref('users/' + userId).set({
-        email: email,
-        password: password // In productie moet je wachtwoorden hashen!
-    }).then(() => {
-        alert('Registratie succesvol!');
-    }).catch(error => {
-        console.error('Fout bij registratie:', error);
-    });
+    firebase.auth().createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            // Registratie succesvol
+            const user = userCredential.user;
+            alert('Registratie succesvol!');
+        })
+        .catch((error) => {
+            // Fout bij registratie
+            console.error('Fout bij registratie:', error);
+            alert('Registratie mislukt: ' + error.message);
+        });
 }
 
 function loginUser(email, password) {
-    const userId = email.replace('.', '_');
-    firebase.database().ref('users/' + userId).once('value')
-        .then(snapshot => {
-            if (snapshot.exists()) {
-                const userData = snapshot.val();
-                if (userData.password === password) {
-                    alert('Inloggen succesvol!');
-                    localStorage.setItem('loggedInUser', email);
-                    showApp();
-                } else {
-                    alert('Ongeldig wachtwoord.');
-                }
-            } else {
-                alert('Gebruiker niet gevonden.');
-            }
+    firebase.auth().signInWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            // Inloggen succesvol
+            const user = userCredential.user;
+            alert('Inloggen succesvol!');
+            localStorage.setItem('loggedInUser', email);
+            showApp(); // Toon de rest van de app
         })
-        .catch(error => {
+        .catch((error) => {
+            // Fout bij inloggen
             console.error('Fout bij inloggen:', error);
+            alert('Inloggen mislukt: ' + error.message);
         });
 }
 
@@ -306,6 +302,101 @@ document.addEventListener('DOMContentLoaded', () => {
         confirmPost(photoData);
         closeCameraModal();
     });
+
+    const loginPopup = document.getElementById('loginPopup');
+    const loginButton = document.getElementById('loginButton');
+    const loginEmail = document.getElementById('loginEmail');
+    const loginPassword = document.getElementById('loginPassword');
+
+    // Verberg de rest van de app totdat de gebruiker is ingelogd
+    document.body.style.overflow = 'hidden';
+
+    loginButton.addEventListener('click', () => {
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value.trim();
+
+        if (!email || !password) {
+            alert('Vul je email en wachtwoord in.');
+            return;
+        }
+
+        // Simuleer een login (vervang dit met Firebase-authenticatie als nodig)
+        loginUser(email, password);
+    });
+
+    function loginUser(email, password) {
+        const userId = email.replace('.', '_'); // Firebase ondersteunt geen punten in sleutels
+        firebase.database().ref('users/' + userId).once('value')
+            .then(snapshot => {
+                if (snapshot.exists()) {
+                    const userData = snapshot.val();
+                    if (userData.password === password) {
+                        alert('Inloggen succesvol!');
+                        localStorage.setItem('loggedInUser', email);
+                        loginPopup.style.display = 'none';
+                        document.body.style.overflow = 'auto'; // Herstel scrollen
+                    } else {
+                        alert('Ongeldig wachtwoord.');
+                    }
+                } else {
+                    alert('Gebruiker niet gevonden.');
+                }
+            })
+            .catch(error => {
+                console.error('Fout bij inloggen:', error);
+            });
+    }
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const loginPopup = document.getElementById('loginPopup');
+    const loginButton = document.getElementById('loginButton');
+    const loginEmail = document.getElementById('loginEmailPopup'); // Aangepaste id
+    const loginPassword = document.getElementById('loginPasswordPopup'); // Aangepaste id
+
+    // Verberg de rest van de app totdat de gebruiker is ingelogd
+    document.body.style.overflow = 'hidden';
+
+    loginButton.addEventListener('click', () => {
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value.trim();
+
+        if (!email || !password) {
+            alert('Vul je email en wachtwoord in.');
+            return;
+        }
+
+        // Simuleer een login (vervang dit met Firebase-authenticatie als nodig)
+        loginUser(email, password);
+    });
+});
+
+document.addEventListener('DOMContentLoaded', () => {
+    const loginPopup = document.getElementById('loginPopup');
+
+    // Controleer of de gebruiker al is ingelogd
+    const loggedInUser = localStorage.getItem('loggedInUser');
+    if (loggedInUser) {
+        loginPopup.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Herstel scrollen
+        return;
+    }
+
+    // Toon de login-popup als de gebruiker niet is ingelogd
+    document.body.style.overflow = 'hidden';
+});
+
+firebase.auth().onAuthStateChanged((user) => {
+    const loginPopup = document.getElementById('loginPopup');
+    if (user) {
+        // Gebruiker is ingelogd
+        loginPopup.style.display = 'none';
+        document.body.style.overflow = 'auto'; // Herstel scrollen
+    } else {
+        // Gebruiker is niet ingelogd
+        loginPopup.style.display = 'flex';
+        document.body.style.overflow = 'hidden';
+    }
 });
 
 window.openCameraModal = openCameraModal;
