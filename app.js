@@ -304,7 +304,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     const loginPopup = document.getElementById('loginPopup');
-    const loginButton = document.getElementById('loginButton');
     const loginEmail = document.getElementById('loginEmail');
     const loginPassword = document.getElementById('loginPassword');
 
