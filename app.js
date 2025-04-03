@@ -1,5 +1,20 @@
 let videoStream;
 
+// Firebase-configuratie
+const firebaseConfig = {
+    apiKey: "AIzaSyBGwwEsBMQADESSoTvo0Tsq67-HUl9dfjs",
+    authDomain: "sportbuddy-d830f.firebaseapp.com",
+    databaseURL: "https://sportbuddy-d830f-default-rtdb.europe-west1.firebasedatabase.app/", // Correcte URL
+    projectId: "sportbuddy-d830f",
+    storageBucket: "sportbuddy-d830f.appspot.com",
+    messagingSenderId: "392455948044",
+    appId: "1:392455948044:web:bacedecd2f7db73d606b29"
+};
+
+// Initialiseer Firebase
+firebase.initializeApp(firebaseConfig);
+const database = firebase.database();
+
 // Camera functies
 function openCameraModal() {
     const modal = document.getElementById('cameraModal');
@@ -163,60 +178,67 @@ function createPost(photoData, caption) {
 
 // Opslag functies
 function savePost(photoData, caption) {
-    let posts = JSON.parse(localStorage.getItem('sportbuddy_posts')) || [];
-    posts.unshift({ 
-        photo: photoData, 
+    const postId = firebase.database().ref().child('posts').push().key;
+    const post = {
+        photo: photoData,
         caption: caption,
         timestamp: new Date().toISOString()
-    });
-    localStorage.setItem('sportbuddy_posts', JSON.stringify(posts));
+    };
+
+    firebase.database().ref('posts/' + postId).set(post)
+        .then(() => {
+            console.log('Post opgeslagen in Firebase.');
+        })
+        .catch(error => {
+            console.error('Fout bij opslaan van post:', error);
+        });
 }
 
 function loadPosts() {
-    const posts = JSON.parse(localStorage.getItem('sportbuddy_posts')) || [];
-    const container = document.querySelector('.container');
+    firebase.database().ref('posts').once('value')
+        .then(snapshot => {
+            const posts = snapshot.val();
+            if (posts) {
+                const container = document.querySelector('.container');
+                Object.values(posts).forEach(post => {
+                    const postCard = document.createElement('div');
+                    postCard.className = 'card';
 
-    posts.forEach(post => {
-        const postCard = document.createElement('div');
-        postCard.className = 'card';
+                    // Afbeelding
+                    const imageContainer = document.createElement('div');
+                    imageContainer.className = 'card-image-container';
 
-        // Afbeelding
-        const imageContainer = document.createElement('div');
-        imageContainer.className = 'card-image-container';
-        
-        const img = document.createElement('img');
-        img.src = post.photo;
-        img.alt = 'Sport moment';
-        imageContainer.appendChild(img);
-        postCard.appendChild(imageContainer);
+                    const img = document.createElement('img');
+                    img.src = post.photo;
+                    img.alt = 'Sport moment';
+                    imageContainer.appendChild(img);
+                    postCard.appendChild(imageContainer);
 
-        // Content
-        const contentDiv = document.createElement('div');
-        contentDiv.className = 'card-content';
-        
-        const username = document.createElement('h3');
-        username.textContent = 'Jij';
-        contentDiv.appendChild(username);
-        
-        const captionEl = document.createElement('p');
-        captionEl.textContent = post.caption;
-        contentDiv.appendChild(captionEl);
-        
-        const timeEl = document.createElement('div');
-        timeEl.className = 'card-time';
-        timeEl.textContent = formatTime(post.timestamp);
-        contentDiv.appendChild(timeEl);
-        
-        postCard.appendChild(contentDiv);
+                    // Content
+                    const contentDiv = document.createElement('div');
+                    contentDiv.className = 'card-content';
 
-        // Voeg toe na de camera knop
-        const cameraBtn = document.querySelector('.container button');
-        if (cameraBtn) {
-            cameraBtn.insertAdjacentElement('afterend', postCard);
-        } else {
-            container.prepend(postCard);
-        }
-    });
+                    const username = document.createElement('h3');
+                    username.textContent = 'Jij';
+                    contentDiv.appendChild(username);
+
+                    const captionEl = document.createElement('p');
+                    captionEl.textContent = post.caption;
+                    contentDiv.appendChild(captionEl);
+
+                    const timeEl = document.createElement('div');
+                    timeEl.className = 'card-time';
+                    timeEl.textContent = formatTime(post.timestamp);
+                    contentDiv.appendChild(timeEl);
+
+                    postCard.appendChild(contentDiv);
+                    container.appendChild(postCard);
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Fout bij laden van posts:', error);
+        });
 }
 
 // Hulp functies
@@ -248,6 +270,40 @@ function clearPhotos() {
     }
 }
 
+function registerUser(email, password) {
+    const userId = email.replace('.', '_'); // Firebase ondersteunt geen punten in sleutels
+    firebase.database().ref('users/' + userId).set({
+        email: email,
+        password: password // In productie moet je wachtwoorden hashen!
+    }).then(() => {
+        alert('Registratie succesvol!');
+    }).catch(error => {
+        console.error('Fout bij registratie:', error);
+    });
+}
+
+function loginUser(email, password) {
+    const userId = email.replace('.', '_');
+    firebase.database().ref('users/' + userId).once('value')
+        .then(snapshot => {
+            if (snapshot.exists()) {
+                const userData = snapshot.val();
+                if (userData.password === password) {
+                    alert('Inloggen succesvol!');
+                    localStorage.setItem('loggedInUser', email);
+                    showApp();
+                } else {
+                    alert('Ongeldig wachtwoord.');
+                }
+            } else {
+                alert('Gebruiker niet gevonden.');
+            }
+        })
+        .catch(error => {
+            console.error('Fout bij inloggen:', error);
+        });
+}
+
 // Initialisatie
 document.addEventListener('DOMContentLoaded', () => {
     loadPosts();
@@ -270,3 +326,5 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 });
+
+window.openCameraModal = openCameraModal;
