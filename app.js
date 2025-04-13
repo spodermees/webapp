@@ -20,8 +20,8 @@ let videoStream;
 // DOM elements
 const loginPopup = document.getElementById('loginPopup');
 const loginForm = document.getElementById('loginForm');
-const loginEmail = document.getElementById('loginEmailPopup');
-const loginPassword = document.getElementById('loginPasswordPopup');
+const loginEmail = document.getElementById('email'); // Correct ID
+const loginPassword = document.getElementById('password'); // Correct ID
 const appContent = document.getElementById('appContent');
 const navbar = document.querySelector('.navbar');
 const container = document.querySelector('.container');
@@ -71,6 +71,23 @@ function setupEventListeners() {
         loginUser(email, password);
     });
 
+    // Registratieformulier
+    const registerForm = document.getElementById('registerForm');
+    registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+
+        const username = document.getElementById('registerUsername').value.trim();
+        const email = document.getElementById('registerEmail').value.trim();
+        const password = document.getElementById('registerPassword').value.trim();
+
+        if (!username || !email || !password) {
+            alert("Vul alle velden in.");
+            return;
+        }
+
+        registerUser(username, email, password);
+    });
+
     // Camera button
     document.querySelector('.container button').addEventListener('click', openCameraModal);
     
@@ -89,35 +106,68 @@ function setupEventListeners() {
 }
 
 function loginUser(email, password) {
-    const loginButton = document.getElementById('loginButton');
+    const loginButton = loginForm.querySelector('button[type="submit"]'); // Dynamisch de knop selecteren
     const originalText = loginButton.textContent;
-    
+
     loginButton.disabled = true;
     loginButton.textContent = 'Inloggen...';
 
     auth.signInWithEmailAndPassword(email, password)
-    .then((userCredential) => {
-        // Login successful - handled by auth state observer
-    })
-    .catch((error) => {
-        console.error('Login error:', error);
-        loginButton.disabled = false;
-        loginButton.textContent = originalText;
-        
-        let errorMessage = 'Inloggen mislukt.';
-        switch(error.code) {
-            case 'auth/wrong-password':
-                errorMessage = 'Ongeldig wachtwoord';
-                break;
-            case 'auth/user-not-found':
-                errorMessage = 'Gebruiker niet gevonden';
-                break;
-            case 'auth/network-request-failed':
-                errorMessage = 'Netwerkfout. Controleer je internetverbinding.';
-                break;
-        }
-        alert(errorMessage);
-    });
+        .then((userCredential) => {
+            // Login successful - handled by auth state observer
+        })
+        .catch((error) => {
+            console.error('Login error:', error);
+            loginButton.disabled = false;
+            loginButton.textContent = originalText;
+
+            let errorMessage = 'Inloggen mislukt.';
+            switch (error.code) {
+                case 'auth/wrong-password':
+                    errorMessage = 'Ongeldig wachtwoord';
+                    break;
+                case 'auth/user-not-found':
+                    errorMessage = 'Gebruiker niet gevonden';
+                    break;
+                case 'auth/network-request-failed':
+                    errorMessage = 'Netwerkfout. Controleer je internetverbinding.';
+                    break;
+            }
+            alert(errorMessage);
+        });
+}
+
+function registerUser(username, email, password) {
+    const registerButton = document.getElementById('registerButton');
+    const originalText = registerButton.textContent;
+
+    registerButton.disabled = true;
+    registerButton.textContent = 'Registreren...';
+
+    auth.createUserWithEmailAndPassword(email, password)
+        .then((userCredential) => {
+            const user = userCredential.user;
+
+            // Sla extra gebruikersinformatie op in de database
+            return database.ref('users/' + user.uid).set({
+                username: username,
+                email: email,
+                createdAt: new Date().toISOString()
+            });
+        })
+        .then(() => {
+            alert('Account succesvol aangemaakt!');
+            document.getElementById('registerPopup').style.display = 'none';
+            document.getElementById('loginPopup').style.display = 'flex';
+        })
+        .catch((error) => {
+            console.error('Registratiefout:', error);
+            alert('Registratie mislukt: ' + error.message);
+        })
+        .finally(() => {
+            registerButton.disabled = false;
+            registerButton.textContent = originalText;
+        });
 }
 
 // Camera functions
