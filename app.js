@@ -405,13 +405,14 @@ document.addEventListener('DOMContentLoaded', initApp);
 window.openCameraModal = openCameraModal;
 window.closeCameraModal = closeCameraModal;
 
-function showProfile() {
-    const profilePage = document.getElementById('profilePage');
-    const appContent = document.getElementById('appContent');
+function showHome() {
+    hideAllPages();
+    document.getElementById('appContent').style.display = 'block'; // Toon de posts-sectie
+}
 
-    // Verberg de hoofdinhoud en toon de profielpagina
-    appContent.style.display = 'none';
-    profilePage.style.display = 'block';
+function showProfile() {
+    hideAllPages();
+    document.getElementById('profilePage').style.display = 'block';
 
     // Haal gebruikersgegevens op uit Firebase
     const userId = auth.currentUser?.uid;
@@ -427,6 +428,18 @@ function showProfile() {
                 alert('Kan gebruikersgegevens niet ophalen.');
             });
     }
+}
+
+function showSettings() {
+    hideAllPages();
+    document.getElementById('settingsPage').style.display = 'block';
+}
+
+function hideAllPages() {
+    document.getElementById('homePage').style.display = 'none';
+    document.getElementById('profilePage').style.display = 'none';
+    document.getElementById('settingsPage').style.display = 'none';
+    document.getElementById('appContent').style.display = 'none'; // Verberg de posts-sectie
 }
 
 document.getElementById('profileForm').addEventListener('submit', (e) => {

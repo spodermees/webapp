@@ -306,6 +306,42 @@
             border: none;
             border-radius: 5px;
         }
+
+        #homePage, #settingsPage {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        #homePage h2, #settingsPage h2 {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        #settingsForm {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #settingsForm label {
+            font-weight: bold;
+        }
+
+        #settingsForm input {
+            margin-left: 10px;
+        }
+
+        #settingsForm button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
     </style>
 </head>
 
@@ -394,11 +430,25 @@
         <button onclick="logout()" class="btn-danger">Uitloggen</button>
     </div>
 
+    <div id="homePage" style="display: none; padding: 20px;">
+        <h2>Home</h2>
+        <p>Welkom op de Homepagina!</p>
+    </div>
+
+    <div id="settingsPage" style="display: none; padding: 20px;">
+        <h2>Instellingen</h2>
+        <form id="settingsForm">
+            <label for="notificationToggle">Notificaties:</label>
+            <input type="checkbox" id="notificationToggle">
+            <button type="submit" class="btn-primary">Opslaan</button>
+        </form>
+    </div>
+
     <div class="navbar">
-        <a href="#">Home</a>
+        <a href="#" onclick="showHome()">Home</a>
         <a href="#">Feed</a>
         <a href="#" onclick="showProfile()">Profile</a>
-        <a href="#">Settings</a>
+        <a href="#" onclick="showSettings()">Settings</a>
     </div>
 
 <!-- Firebase scripts (MUST come before your app.js) -->
