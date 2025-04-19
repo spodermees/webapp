@@ -404,3 +404,60 @@ document.addEventListener('DOMContentLoaded', initApp);
 // Global functions
 window.openCameraModal = openCameraModal;
 window.closeCameraModal = closeCameraModal;
+
+function showProfile() {
+    const profilePage = document.getElementById('profilePage');
+    const appContent = document.getElementById('appContent');
+
+    // Verberg de hoofdinhoud en toon de profielpagina
+    appContent.style.display = 'none';
+    profilePage.style.display = 'block';
+
+    // Haal gebruikersgegevens op uit Firebase
+    const userId = auth.currentUser?.uid;
+    if (userId) {
+        database.ref('users/' + userId).once('value')
+            .then(snapshot => {
+                const userData = snapshot.val();
+                document.getElementById('profileUsername').value = userData.username || '';
+                document.getElementById('profileEmail').value = userData.email || '';
+            })
+            .catch(error => {
+                console.error('Fout bij ophalen van gebruikersgegevens:', error);
+                alert('Kan gebruikersgegevens niet ophalen.');
+            });
+    }
+}
+
+document.getElementById('profileForm').addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById('profileUsername').value.trim();
+    const userId = auth.currentUser?.uid;
+
+    if (!username) {
+        alert('Gebruikersnaam mag niet leeg zijn.');
+        return;
+    }
+
+    // Update gebruikersnaam in Firebase
+    database.ref('users/' + userId).update({ username })
+        .then(() => {
+            alert('Profiel succesvol bijgewerkt!');
+        })
+        .catch(error => {
+            console.error('Fout bij bijwerken van profiel:', error);
+            alert('Kan profiel niet bijwerken.');
+        });
+});
+
+function logout() {
+    auth.signOut()
+        .then(() => {
+            alert('Je bent uitgelogd.');
+            location.reload(); // Herlaad de pagina om terug te keren naar de login
+        })
+        .catch(error => {
+            console.error('Fout bij uitloggen:', error);
+        });
+}
