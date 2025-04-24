@@ -299,31 +299,14 @@ function savePost(photoData, caption) {
     .catch(error => console.error('Fout bij opslaan van post:', error));
 }
 function loadPosts() {
-    const loadingIndicator = document.createElement('div');
-    loadingIndicator.textContent = 'Posts laden...';
-    loadingIndicator.style.textAlign = 'center';
-    container.appendChild(loadingIndicator);
-
     database.ref('posts').once('value')
         .then(snapshot => {
-            loadingIndicator.remove(); // Verwijder de laadindicator
             const posts = snapshot.val();
             if (posts) {
-                // Clear existing posts (keep only the example post)
-                const cards = document.querySelectorAll('.card');
-                cards.forEach(card => {
-                    const username = card.querySelector('h3');
-                    if (!username || username.textContent !== 'David Martinez') {
-                        card.remove();
-                    }
-                });
-
-                // Convert posts object to array and sort by timestamp (newest first)
                 const postsArray = Object.entries(posts)
                     .map(([id, post]) => ({ id, ...post }))
                     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-                // Add posts from Firebase
                 postsArray.forEach(post => {
                     if (document.getElementById(`post-${post.id}`)) return;
 
@@ -344,18 +327,42 @@ function loadPosts() {
                     const contentDiv = document.createElement('div');
                     contentDiv.className = 'card-content';
 
-                    // Fetch username from Firebase
+                    // Haal gebruikersinformatie op
                     database.ref('users/' + post.userId).once('value')
                         .then(userSnapshot => {
-                            const username = userSnapshot.val()?.username || 'Onbekend';
-                            const usernameEl = document.createElement('h3');
-                            usernameEl.textContent = post.userId === auth.currentUser?.uid ? 'Jij' : username;
-                            contentDiv.appendChild(usernameEl);
+                            const userData = userSnapshot.val();
+                            const username = userData?.username || 'Onbekend';
+                            const photoURL = userData?.photoURL || 'https://via.placeholder.com/50';
 
+                            // Profielfoto
+                            const profileImg = document.createElement('img');
+                            profileImg.src = photoURL;
+                            profileImg.alt = 'Profielfoto';
+                            profileImg.style.width = '40px';
+                            profileImg.style.height = '40px';
+                            profileImg.style.borderRadius = '50%';
+                            profileImg.style.marginRight = '10px';
+
+                            // Gebruikersnaam
+                            const usernameEl = document.createElement('h3');
+                            usernameEl.textContent = username;
+                            usernameEl.style.display = 'inline-block';
+                            usernameEl.style.verticalAlign = 'middle';
+
+                            const userContainer = document.createElement('div');
+                            userContainer.style.display = 'flex';
+                            userContainer.style.alignItems = 'center';
+                            userContainer.appendChild(profileImg);
+                            userContainer.appendChild(usernameEl);
+
+                            contentDiv.appendChild(userContainer);
+
+                            // Caption
                             const captionEl = document.createElement('p');
                             captionEl.textContent = post.caption;
                             contentDiv.appendChild(captionEl);
 
+                            // Timestamp
                             const timeEl = document.createElement('div');
                             timeEl.className = 'card-time';
                             timeEl.textContent = formatTime(post.timestamp);
@@ -363,21 +370,18 @@ function loadPosts() {
 
                             postCard.appendChild(contentDiv);
 
-                            // Insert after the camera button (before any other posts)
-                            const cameraBtn = document.querySelector('.container button');
-                            if (cameraBtn && cameraBtn.nextElementSibling) {
-                                cameraBtn.nextElementSibling.before(postCard);
-                            } else {
-                                container.appendChild(postCard);
-                            }
+                            // Voeg de post toe aan de container
+                            const container = document.querySelector('.container');
+                            container.appendChild(postCard);
+                        })
+                        .catch(error => {
+                            console.error('Fout bij ophalen van gebruikersinformatie:', error);
                         });
                 });
             }
         })
         .catch(error => {
-            loadingIndicator.remove(); // Verwijder de laadindicator bij een fout
             console.error('Fout bij laden van posts:', error);
-            alert('Fout bij het laden van posts. Probeer de pagina te verversen.');
         });
 }
 
