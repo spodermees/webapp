@@ -283,30 +283,6 @@
             margin-bottom: 20px;
         }
 
-        #profilePage form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        #profilePage label {
-            font-weight: bold;
-        }
-
-        #profilePage input {
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-        }
-
-        #profilePage button {
-            padding: 10px;
-            font-size: 16px;
-            cursor: pointer;
-            border: none;
-            border-radius: 5px;
-        }
-
         #homePage, #settingsPage {
             max-width: 600px;
             margin: 20px auto;
@@ -336,6 +312,38 @@
         }
 
         #settingsForm button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            border: none;
+            border-radius: 5px;
+        }
+
+        #profilePhotoPreview {
+            display: none;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            margin-top: 10px;
+        }
+
+        #profileForm {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        #profileForm label {
+            font-weight: bold;
+        }
+
+        #profileForm input {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+
+        #profileForm button {
             padding: 10px;
             font-size: 16px;
             cursor: pointer;
@@ -425,6 +433,10 @@
             <label for="profileEmail">Email:</label>
             <input type="email" id="profileEmail" placeholder="Email" disabled>
 
+            <label for="profilePhoto">Profielfoto:</label>
+            <input type="file" id="profilePhoto" accept="image/*">
+            <img id="profilePhotoPreview" src="#" alt="Profielfoto" style="display: none; width: 100px; height: 100px; border-radius: 50%; margin-top: 10px;">
+
             <button type="submit" class="btn-primary">Opslaan</button>
         </form>
         <button onclick="logout()" class="btn-danger">Uitloggen</button>
@@ -455,6 +467,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-database-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
 
 <!-- Your script - add defer to prevent duplicate execution -->
 <script src="app.js" defer></script>

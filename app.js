@@ -414,7 +414,6 @@ function showProfile() {
     hideAllPages();
     document.getElementById('profilePage').style.display = 'block';
 
-    // Haal gebruikersgegevens op uit Firebase
     const userId = auth.currentUser?.uid;
     if (userId) {
         database.ref('users/' + userId).once('value')
@@ -422,6 +421,12 @@ function showProfile() {
                 const userData = snapshot.val();
                 document.getElementById('profileUsername').value = userData.username || '';
                 document.getElementById('profileEmail').value = userData.email || '';
+
+                if (userData.photoURL) {
+                    const preview = document.getElementById('profilePhotoPreview');
+                    preview.src = userData.photoURL; // Stel de Base64-afbeelding in als bron
+                    preview.style.display = 'block';
+                }
             })
             .catch(error => {
                 console.error('Fout bij ophalen van gebruikersgegevens:', error);
@@ -442,19 +447,36 @@ function hideAllPages() {
     document.getElementById('appContent').style.display = 'none'; // Verberg de posts-sectie
 }
 
-document.getElementById('profileForm').addEventListener('submit', (e) => {
+document.getElementById('profileForm').addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const username = document.getElementById('profileUsername').value.trim();
     const userId = auth.currentUser?.uid;
+    const file = document.getElementById('profilePhoto').files[0];
 
     if (!username) {
         alert('Gebruikersnaam mag niet leeg zijn.');
         return;
     }
 
-    // Update gebruikersnaam in Firebase
-    database.ref('users/' + userId).update({ username })
+    let photoData = null;
+
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            photoData = event.target.result; // Base64-encoded afbeelding
+        };
+        reader.readAsDataURL(file);
+        await new Promise((resolve) => (reader.onloadend = resolve)); // Wacht tot de afbeelding is geladen
+    }
+
+    // Update gebruikersgegevens in Firebase
+    const updates = { username };
+    if (photoData) {
+        updates.photoURL = photoData; // Sla de Base64-afbeelding op in de database
+    }
+
+    database.ref('users/' + userId).update(updates)
         .then(() => {
             alert('Profiel succesvol bijgewerkt!');
         })
@@ -474,3 +496,16 @@ function logout() {
             console.error('Fout bij uitloggen:', error);
         });
 }
+
+document.getElementById('profilePhoto').addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const preview = document.getElementById('profilePhotoPreview');
+            preview.src = event.target.result;
+            preview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+    }
+});
