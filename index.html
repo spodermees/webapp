@@ -365,6 +365,43 @@
             border: none;
             border-radius: 5px;
         }
+
+        #friendsPage {
+            max-width: 600px;
+            margin: 20px auto;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+
+        #searchBar {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+
+        #searchResults div {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff;
+        }
+
+        #searchResults img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        #searchResults span {
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -471,12 +508,23 @@
         </form>
     </div>
 
+    <div id="friendsPage" style="display: none; padding: 20px;">
+        <h2>Vrienden</h2>
+        <form id="friendRequestForm">
+            <label for="friendRequest">Stuur een vriendschapsverzoek:</label>
+            <input type="text" id="friendRequest" placeholder="Voer gebruikersnaam in..." required>
+            <button type="submit" class="btn-primary">Verstuur</button>
+        <input type="text" id="searchBar" placeholder="Zoek naar gebruikers..." style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px;">
+        <div id="searchResults" style="display: flex; flex-direction: column; gap: 15px;"></div>
+        </form>
+    </div>
+
     <div class="navbar">
         <a href="#" onclick="showHome()">Home</a>
         <a href="#">Discover</a>
         <a href="#" onclick="showProfile()">Profile</a>
         <a href="#" onclick="showSettings()">Settings</a>
-        <a href="#" onclick>Friends</a> 
+        <a href="#" onclick="showFriends()">Friends</a> 
     </div>
 
 <!-- Firebase scripts (MUST come before your app.js) -->

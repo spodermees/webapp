@@ -103,6 +103,55 @@ function setupEventListeners() {
     });
     
     document.querySelector('#previewModal .btn-danger').addEventListener('click', closePreviewModal);
+
+    document.getElementById('searchBar').addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        const resultsContainer = document.getElementById('searchResults');
+        resultsContainer.innerHTML = ''; // Wis eerdere resultaten
+
+        if (query.length > 0) {
+            database.ref('users').once('value')
+                .then(snapshot => {
+                    const users = snapshot.val();
+                    if (users) {
+                        Object.entries(users).forEach(([userId, userData]) => {
+                            if (userData.username && userData.username.toLowerCase().includes(query)) {
+                                // Maak een resultaatkaart
+                                const resultCard = document.createElement('div');
+                                resultCard.style.display = 'flex';
+                                resultCard.style.alignItems = 'center';
+                                resultCard.style.padding = '10px';
+                                resultCard.style.border = '1px solid #ddd';
+                                resultCard.style.borderRadius = '5px';
+                                resultCard.style.background = '#fff';
+
+                                // Profielfoto
+                                const profileImg = document.createElement('img');
+                                profileImg.src = userData.photoURL || 'https://via.placeholder.com/50';
+                                profileImg.alt = 'Profielfoto';
+                                profileImg.style.width = '40px';
+                                profileImg.style.height = '40px';
+                                profileImg.style.borderRadius = '50%';
+                                profileImg.style.marginRight = '10px';
+
+                                // Gebruikersnaam
+                                const usernameEl = document.createElement('span');
+                                usernameEl.textContent = userData.username;
+                                usernameEl.style.fontWeight = 'bold';
+
+                                resultCard.appendChild(profileImg);
+                                resultCard.appendChild(usernameEl);
+
+                                resultsContainer.appendChild(resultCard);
+                            }
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Fout bij zoeken naar gebruikers:', error);
+                });
+        }
+    });
 }
 
 function loginUser(email, password) {
@@ -513,3 +562,11 @@ document.getElementById('profilePhoto').addEventListener('change', (e) => {
         reader.readAsDataURL(file);
     }
 });
+
+function showFriends() {
+    hideAllPages();
+    document.getElementById('friendsPage').style.display = 'block';
+}
+
+// Maak de functie globaal beschikbaar
+window.showFriends = showFriends;
