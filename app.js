@@ -124,6 +124,7 @@ function setupEventListeners() {
                                 resultCard.style.border = '1px solid #ddd';
                                 resultCard.style.borderRadius = '5px';
                                 resultCard.style.background = '#fff';
+                                resultCard.style.justifyContent = 'space-between';
 
                                 // Profielfoto
                                 const profileImg = document.createElement('img');
@@ -139,8 +140,24 @@ function setupEventListeners() {
                                 usernameEl.textContent = userData.username;
                                 usernameEl.style.fontWeight = 'bold';
 
+                                // "+"-knop
+                                const addButton = document.createElement('button');
+                                addButton.textContent = '+';
+                                addButton.style.padding = '5px 10px';
+                                addButton.style.border = 'none';
+                                addButton.style.borderRadius = '5px';
+                                addButton.style.backgroundColor = '#4CAF50';
+                                addButton.style.color = '#fff';
+                                addButton.style.cursor = 'pointer';
+
+                                // Voeg klikfunctionaliteit toe aan de "+"-knop
+                                addButton.addEventListener('click', () => {
+                                    addFriend(userId, userData.username);
+                                });
+
                                 resultCard.appendChild(profileImg);
                                 resultCard.appendChild(usernameEl);
+                                resultCard.appendChild(addButton);
 
                                 resultsContainer.appendChild(resultCard);
                             }
@@ -570,3 +587,25 @@ function showFriends() {
 
 // Maak de functie globaal beschikbaar
 window.showFriends = showFriends;
+
+function addFriend(friendId, friendUsername) {
+    const userId = auth.currentUser?.uid;
+
+    if (!userId) {
+        alert('Je moet ingelogd zijn om vrienden toe te voegen.');
+        return;
+    }
+
+    // Sla het vriendschapsverzoek op in de database
+    database.ref(`friendRequests/${friendId}/${userId}`).set({
+        username: auth.currentUser.displayName || 'Onbekend',
+        timestamp: new Date().toISOString()
+    })
+    .then(() => {
+        alert(`Vriendschapsverzoek verzonden naar ${friendUsername}!`);
+    })
+    .catch(error => {
+        console.error('Fout bij toevoegen van vriend:', error);
+        alert('Er is een fout opgetreden bij het verzenden van het vriendschapsverzoek.');
+    });
+}
