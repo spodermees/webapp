@@ -696,26 +696,36 @@ function loadFriendRequests() {
 }
 
 function acceptFriendRequest(userId, requesterId, requesterUsername) {
-    // Haal de gebruikersnaam van de huidige gebruiker op
+    // Haal de gebruikersnaam en profielfoto van de huidige gebruiker op
     database.ref(`users/${userId}`).once('value')
         .then(snapshot => {
             const currentUserData = snapshot.val();
             const currentUsername = currentUserData?.username || 'Onbekend';
+            const currentPhotoURL = currentUserData?.photoURL || 'https://via.placeholder.com/50';
 
-            // Voeg de vriend toe aan de vriendenlijst van de huidige gebruiker
-            return Promise.all([
-                database.ref(`friends/${userId}/${requesterId}`).set({
-                    username: requesterUsername,
-                    timestamp: new Date().toISOString()
-                }),
-                // Voeg de huidige gebruiker toe aan de vriendenlijst van de requester
-                database.ref(`friends/${requesterId}/${userId}`).set({
-                    username: currentUsername,
-                    timestamp: new Date().toISOString()
-                }),
-                // Verwijder het verzoek
-                database.ref(`friendRequests/${userId}/${requesterId}`).remove()
-            ]);
+            // Haal de gebruikersnaam en profielfoto van de requester op
+            return database.ref(`users/${requesterId}`).once('value')
+                .then(requesterSnapshot => {
+                    const requesterData = requesterSnapshot.val();
+                    const requesterPhotoURL = requesterData?.photoURL || 'https://via.placeholder.com/50';
+
+                    // Voeg de vriend toe aan de vriendenlijst van de huidige gebruiker
+                    return Promise.all([
+                        database.ref(`friends/${userId}/${requesterId}`).set({
+                            username: requesterUsername,
+                            photoURL: requesterPhotoURL,
+                            timestamp: new Date().toISOString()
+                        }),
+                        // Voeg de huidige gebruiker toe aan de vriendenlijst van de requester
+                        database.ref(`friends/${requesterId}/${userId}`).set({
+                            username: currentUsername,
+                            photoURL: currentPhotoURL,
+                            timestamp: new Date().toISOString()
+                        }),
+                        // Verwijder het verzoek
+                        database.ref(`friendRequests/${userId}/${requesterId}`).remove()
+                    ]);
+                });
         })
         .then(() => {
             alert('Vriendschapsverzoek geaccepteerd!');
