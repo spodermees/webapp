@@ -584,6 +584,7 @@ function showFriends() {
     hideAllPages();
     document.getElementById('friendsPage').style.display = 'block';
     loadFriendRequests(); // Laad de vriendschapsverzoeken
+    loadFriends(); // Laad de vriendenlijst
 }
 
 // Maak de functie globaal beschikbaar
@@ -716,5 +717,61 @@ function declineFriendRequest(userId, requesterId) {
         })
         .catch(error => {
             console.error('Fout bij weigeren van vriendschapsverzoek:', error);
+        });
+}
+
+function loadFriends() {
+    const userId = auth.currentUser?.uid;
+
+    if (!userId) {
+        console.error('Gebruiker is niet ingelogd.');
+        return;
+    }
+
+    const friendsContainer = document.getElementById('friendsList');
+    friendsContainer.innerHTML = ''; // Wis eerdere vrienden
+
+    database.ref(`friends/${userId}`).once('value')
+        .then(snapshot => {
+            const friends = snapshot.val();
+            if (friends) {
+                Object.entries(friends).forEach(([friendId, friendData]) => {
+                    // Maak een kaart voor elke vriend
+                    const friendCard = document.createElement('div');
+                    friendCard.style.display = 'flex';
+                    friendCard.style.alignItems = 'center';
+                    friendCard.style.padding = '10px';
+                    friendCard.style.border = '1px solid #ddd';
+                    friendCard.style.borderRadius = '5px';
+                    friendCard.style.background = '#fff';
+                    friendCard.style.justifyContent = 'space-between';
+
+                    // Gebruikersnaam
+                    const usernameEl = document.createElement('span');
+                    usernameEl.textContent = friendData.username;
+                    usernameEl.style.fontWeight = 'bold';
+
+                    // Profielfoto (optioneel, als je deze opslaat)
+                    const profileImg = document.createElement('img');
+                    profileImg.src = friendData.photoURL || 'https://via.placeholder.com/50';
+                    profileImg.alt = 'Profielfoto';
+                    profileImg.style.width = '40px';
+                    profileImg.style.height = '40px';
+                    profileImg.style.borderRadius = '50%';
+                    profileImg.style.marginRight = '10px';
+
+                    friendCard.appendChild(profileImg);
+                    friendCard.appendChild(usernameEl);
+
+                    friendsContainer.appendChild(friendCard);
+                });
+            } else {
+                const noFriends = document.createElement('p');
+                noFriends.textContent = 'Je hebt nog geen vrienden.';
+                friendsContainer.appendChild(noFriends);
+            }
+        })
+        .catch(error => {
+            console.error('Fout bij ophalen van vriendenlijst:', error);
         });
 }

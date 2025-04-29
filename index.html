@@ -415,6 +415,26 @@
         #searchResults button:hover {
             background-color: #45a049;
         }
+
+        #friendsList div {
+            display: flex;
+            align-items: center;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background: #fff;
+        }
+
+        #friendsList img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-right: 10px;
+        }
+
+        #friendsList span {
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -528,6 +548,9 @@
 
         <h3>Vriendschapsverzoeken</h3>
         <div id="friendRequests" style="display: flex; flex-direction: column; gap: 15px;"></div>
+
+        <h3>Jouw vrienden</h3>
+        <div id="friendsList" style="display: flex; flex-direction: column; gap: 15px;"></div>
     </div>
 
     <div class="navbar">
