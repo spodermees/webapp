@@ -448,16 +448,17 @@
             </button>
 
             <!-- Voorbeeld posts -->
-            <div class="card">
+            <!-- <div class="card">
                 <div class="card-image-container">
-                    <!-- <img src="https://via.placeholder.com/600x800" alt="Marathon"> -->
-                </div>
+                     <img src="https://via.placeholder.com/600x800" alt="Marathon"> -->
+                <!-- </div>
                 <div class="card-content">
                     <h3>David Martinez</h3>
                     <p>Just finished the marathon!</p>
                     <div class="card-time">2 uur geleden</div>
                 </div>
-            </div>
+            </div> --> 
+
 
             <!-- Posts worden hier toegevoegd -->
         </div>
@@ -466,10 +467,10 @@
     <!-- Camera Modal -->
     <div id="cameraModal">
         <div class="modal-content">
-            <h2>Maak een Foto</h2>
+            <h2>Take a picture</h2>
             <video id="cameraVideo" autoplay playsinline></video>
-            <button id="captureButton" class="btn-primary">Neem Foto</button>
-            <button onclick="closeCameraModal()" class="btn-danger">Sluiten</button>
+            <button id="captureButton" class="btn-primary">Take Picture</button>
+            <button onclick="closeCameraModal()" class="btn-danger">Close</button>
         </div>
     </div>
 
@@ -480,8 +481,8 @@
             <img id="previewImage" src="#" alt="Preview">
             <textarea id="postCaption" placeholder="Voeg een beschrijving toe..."></textarea>
             <div style="display: flex; justify-content: space-between;">
-                <button id="confirmPost" class="btn-primary">Posten</button>
-                <button onclick="closePreviewModal()" class="btn-danger">Annuleren</button>
+                <button id="confirmPost" class="btn-primary">Post</button>
+                <button onclick="closePreviewModal()" class="btn-danger">Cancel</button>
             </div>
         </div>
     </div>
@@ -489,64 +490,64 @@
     <!-- Login Popup -->
     <div id="loginPopup">
         <form id="loginForm">
-            <h2>Inloggen</h2>
+            <h2>Log in</h2>
             <input type="email" id="email" placeholder="Email" required autocomplete="email">
             <input type="password" id="password" placeholder="Wachtwoord" required autocomplete="current-password">
-            <button id="loginButton" type="submit">Inloggen</button> <!-- Voeg het ID 'loginButton' toe -->
-            <p><a href="#" onclick="openRegisterPopup()">Nog geen account? Registreren</a></p>
+            <button id="loginButton" type="submit">Log in</button> <!-- Voeg het ID 'loginButton' toe -->
+            <p><a href="#" onclick="openRegisterPopup()">Don't have a account yet Register/a></p>
         </form>
     </div>
 
     <!-- Registratie Popup -->
     <div id="registerPopup">
         <form id="registerForm">
-            <h2>Registreren</h2>
+            <h2>Register</h2>
             <input type="text" id="registerUsername" placeholder="Gebruikersnaam" required>
             <input type="email" id="registerEmail" placeholder="Email" required autocomplete="email">
             <input type="password" id="registerPassword" placeholder="Wachtwoord" required autocomplete="new-password">
-            <button id="registerButton" type="submit">Registreren</button>
-            <button type="button" onclick="closeRegisterPopup()">Annuleren</button>
+            <button id="registerButton" type="submit">Register</button>
+            <button type="button" onclick="closeRegisterPopup()">Cancel</button>
         </form>
     </div>
 
     <div id="profilePage" style="display: none; padding: 20px;">
-        <h2>Profiel</h2>
+        <h2>Profile</h2>
         <form id="profileForm">
-            <label for="profileUsername">Gebruikersnaam:</label>
+            <label for="profileUsername">Username:</label>
             <input type="text" id="profileUsername" placeholder="Gebruikersnaam" required>
             
             <label for="profileEmail">Email:</label>
             <input type="email" id="profileEmail" placeholder="Email" disabled>
 
-            <label for="profilePhoto">Profielfoto:</label>
+            <label for="profilePhoto">ProfilePicture:</label>
             <input type="file" id="profilePhoto" accept="image/*">
             <img id="profilePhotoPreview" src="#" alt="Profielfoto" style="display: none; width: 100px; height: 100px; border-radius: 50%; margin-top: 10px;">
 
-            <button type="submit" class="btn-primary">Opslaan</button>
+            <button type="submit" class="btn-primary">Save</button>
         </form>
-        <button onclick="logout()" class="btn-danger">Uitloggen</button>
+        <button onclick="logout()" class="btn-danger">Log out</button>
     </div>
 
     <div id="homePage" style="display: none; padding: 20px;">
         <h2>Home</h2>
-        <p>Welkom op de Homepagina!</p>
+        <!-- <p>Welkom op de Homepagina!</p> -->
     </div>
 
     <div id="settingsPage" style="display: none; padding: 20px;">
-        <h2>Instellingen</h2>
+        <h2>Settings</h2>
         <form id="settingsForm">
-            <label for="notificationToggle">Notificaties:</label>
+            <label for="notificationToggle">Notifications</label>
             <input type="checkbox" id="notificationToggle">
-            <button type="submit" class="btn-primary">Opslaan</button>
+            <button type="submit" class="btn-primary">Save</button>
         </form>
     </div>
 
     <div id="friendsPage" style="display: none; padding: 20px;">
-        <h2>Vrienden</h2>
+        <h2>Search Users</h2>
         <input type="text" id="searchBar" placeholder="Zoek naar gebruikers..." style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px;">
         <div id="searchResults" style="display: flex; flex-direction: column; gap: 15px;"></div>
 
-        <h3>Jouw vrienden</h3>
+        <h3>Your Friends</h3>
         <div id="friendsList" style="display: flex; flex-direction: column; gap: 15px;"></div>
     </div>
 
