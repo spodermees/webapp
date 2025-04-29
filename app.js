@@ -583,6 +583,7 @@ document.getElementById('profilePhoto').addEventListener('change', (e) => {
 function showFriends() {
     hideAllPages();
     document.getElementById('friendsPage').style.display = 'block';
+    loadFriendRequests(); // Laad de vriendschapsverzoeken
 }
 
 // Maak de functie globaal beschikbaar
@@ -608,4 +609,112 @@ function addFriend(friendId, friendUsername) {
         console.error('Fout bij toevoegen van vriend:', error);
         alert('Er is een fout opgetreden bij het verzenden van het vriendschapsverzoek.');
     });
+}
+
+function loadFriendRequests() {
+    const userId = auth.currentUser?.uid;
+
+    if (!userId) {
+        console.error('Gebruiker is niet ingelogd.');
+        return;
+    }
+
+    const requestsContainer = document.getElementById('friendRequests');
+    requestsContainer.innerHTML = ''; // Wis eerdere verzoeken
+
+    database.ref(`friendRequests/${userId}`).once('value')
+        .then(snapshot => {
+            const requests = snapshot.val();
+            if (requests) {
+                Object.entries(requests).forEach(([requesterId, requestData]) => {
+                    // Maak een kaart voor elk verzoek
+                    const requestCard = document.createElement('div');
+                    requestCard.style.display = 'flex';
+                    requestCard.style.alignItems = 'center';
+                    requestCard.style.padding = '10px';
+                    requestCard.style.border = '1px solid #ddd';
+                    requestCard.style.borderRadius = '5px';
+                    requestCard.style.background = '#fff';
+                    requestCard.style.justifyContent = 'space-between';
+
+                    // Gebruikersnaam
+                    const usernameEl = document.createElement('span');
+                    usernameEl.textContent = requestData.username;
+                    usernameEl.style.fontWeight = 'bold';
+
+                    // Accept-knop
+                    const acceptButton = document.createElement('button');
+                    acceptButton.textContent = '✔';
+                    acceptButton.style.padding = '5px 10px';
+                    acceptButton.style.border = 'none';
+                    acceptButton.style.borderRadius = '5px';
+                    acceptButton.style.backgroundColor = '#4CAF50';
+                    acceptButton.style.color = '#fff';
+                    acceptButton.style.cursor = 'pointer';
+                    acceptButton.addEventListener('click', () => {
+                        acceptFriendRequest(userId, requesterId, requestData.username);
+                    });
+
+                    // Decline-knop
+                    const declineButton = document.createElement('button');
+                    declineButton.textContent = '✖';
+                    declineButton.style.padding = '5px 10px';
+                    declineButton.style.border = 'none';
+                    declineButton.style.borderRadius = '5px';
+                    declineButton.style.backgroundColor = '#f44336';
+                    declineButton.style.color = '#fff';
+                    declineButton.style.cursor = 'pointer';
+                    declineButton.addEventListener('click', () => {
+                        declineFriendRequest(userId, requesterId);
+                    });
+
+                    requestCard.appendChild(usernameEl);
+                    requestCard.appendChild(acceptButton);
+                    requestCard.appendChild(declineButton);
+
+                    requestsContainer.appendChild(requestCard);
+                });
+            } else {
+                const noRequests = document.createElement('p');
+                noRequests.textContent = 'Geen vriendschapsverzoeken.';
+                requestsContainer.appendChild(noRequests);
+            }
+        })
+        .catch(error => {
+            console.error('Fout bij ophalen van vriendschapsverzoeken:', error);
+        });
+}
+
+function acceptFriendRequest(userId, requesterId, requesterUsername) {
+    // Voeg de vriend toe aan de vriendenlijst
+    database.ref(`friends/${userId}/${requesterId}`).set({
+        username: requesterUsername,
+        timestamp: new Date().toISOString()
+    });
+
+    database.ref(`friends/${requesterId}/${userId}`).set({
+        username: auth.currentUser.displayName || 'Onbekend',
+        timestamp: new Date().toISOString()
+    });
+
+    // Verwijder het verzoek
+    database.ref(`friendRequests/${userId}/${requesterId}`).remove()
+        .then(() => {
+            alert('Vriendschapsverzoek geaccepteerd!');
+            loadFriendRequests(); // Vernieuw de lijst met verzoeken
+        })
+        .catch(error => {
+            console.error('Fout bij accepteren van vriendschapsverzoek:', error);
+        });
+}
+
+function declineFriendRequest(userId, requesterId) {
+    database.ref(`friendRequests/${userId}/${requesterId}`).remove()
+        .then(() => {
+            alert('Vriendschapsverzoek geweigerd.');
+            loadFriendRequests(); // Vernieuw de lijst met verzoeken
+        })
+        .catch(error => {
+            console.error('Fout bij weigeren van vriendschapsverzoek:', error);
+        });
 }
