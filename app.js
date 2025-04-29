@@ -30,7 +30,7 @@ const container = document.querySelector('.container');
 function initApp() {
     // Set up auth state observer
     auth.onAuthStateChanged(handleAuthState);
-    
+
     // Set up event listeners
     setupEventListeners();
 }
@@ -43,7 +43,7 @@ function handleAuthState(user) {
         appContent.style.display = 'block';
         navbar.style.display = 'flex';
         document.body.style.overflow = 'auto';
-        
+
         // Load posts
         loadPosts();
     } else {
@@ -62,12 +62,12 @@ function setupEventListeners() {
         e.preventDefault();
         const email = loginEmail.value.trim();
         const password = loginPassword.value.trim();
-        
+
         if (!email || !password) {
             alert('Vul email en wachtwoord in');
             return;
         }
-        
+
         loginUser(email, password);
     });
 
@@ -90,10 +90,10 @@ function setupEventListeners() {
 
     // Camera button
     document.querySelector('.container button').addEventListener('click', openCameraModal);
-    
+
     // Capture button
     document.getElementById('captureButton').addEventListener('click', capturePhoto);
-    
+
     // Preview modal buttons
     document.getElementById('confirmPost').addEventListener('click', () => {
         const caption = document.getElementById('postCaption').value.trim() || 'Nieuwe sportprestatie!';
@@ -101,7 +101,7 @@ function setupEventListeners() {
         createPost(photoData, caption);
         closePreviewModal();
     });
-    
+
     document.querySelector('#previewModal .btn-danger').addEventListener('click', closePreviewModal);
 
     document.getElementById('searchBar').addEventListener('input', (e) => {
@@ -250,14 +250,14 @@ function openCameraModal() {
             height: { ideal: 720 }
         }
     })
-    .then((stream) => {
-        videoStream = stream;
-        videoElement.srcObject = stream;
-    })
-    .catch((error) => {
-        console.error('Camera toegang geweigerd:', error);
-        alert('Camera toegang geweigerd. Controleer je instellingen.');
-    });
+        .then((stream) => {
+            videoStream = stream;
+            videoElement.srcObject = stream;
+        })
+        .catch((error) => {
+            console.error('Camera toegang geweigerd:', error);
+            alert('Camera toegang geweigerd. Controleer je instellingen.');
+        });
 }
 
 function closeCameraModal() {
@@ -277,21 +277,21 @@ function capturePhoto() {
     const canvas = document.createElement('canvas');
     canvas.width = video.videoWidth;
     canvas.height = video.videoHeight;
-    
+
     const ctx = canvas.getContext('2d');
     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-    
+
     const photoData = canvas.toDataURL('image/jpeg', 0.8);
     showPreview(photoData);
 }
 
 function showPreview(photoData) {
     closeCameraModal();
-    
+
     const previewModal = document.getElementById('previewModal');
     const previewImage = document.getElementById('previewImage');
     const postCaption = document.getElementById('postCaption');
-    
+
     previewImage.src = photoData;
     postCaption.value = '';
     previewModal.style.display = 'flex';
@@ -361,8 +361,8 @@ function savePost(photoData, caption) {
     };
 
     database.ref('posts/' + postId).set(post)
-    .then(() => console.log('Post opgeslagen in Firebase.'))
-    .catch(error => console.error('Fout bij opslaan van post:', error));
+        .then(() => console.log('Post opgeslagen in Firebase.'))
+        .catch(error => console.error('Fout bij opslaan van post:', error));
 }
 function loadPosts() {
     database.ref('posts').once('value')
@@ -514,6 +514,7 @@ function hideAllPages() {
     document.getElementById('homePage').style.display = 'none';
     document.getElementById('profilePage').style.display = 'none';
     document.getElementById('settingsPage').style.display = 'none';
+    document.getElementById('friendsPage').style.display = 'none'; // Verberg de vriendenpagina
     document.getElementById('appContent').style.display = 'none'; // Verberg de posts-sectie
 }
 
