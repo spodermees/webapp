@@ -598,18 +598,25 @@ function addFriend(friendId, friendUsername) {
         return;
     }
 
-    // Sla het vriendschapsverzoek op in de database
-    database.ref(`friendRequests/${friendId}/${userId}`).set({
-        username: auth.currentUser.displayName || 'Onbekend',
-        timestamp: new Date().toISOString()
-    })
-    .then(() => {
-        alert(`Vriendschapsverzoek verzonden naar ${friendUsername}!`);
-    })
-    .catch(error => {
-        console.error('Fout bij toevoegen van vriend:', error);
-        alert('Er is een fout opgetreden bij het verzenden van het vriendschapsverzoek.');
-    });
+    // Haal de gebruikersnaam van de huidige gebruiker op
+    database.ref(`users/${userId}`).once('value')
+        .then(snapshot => {
+            const currentUserData = snapshot.val();
+            const currentUsername = currentUserData?.username || 'Onbekend';
+
+            // Sla het vriendschapsverzoek op in de database
+            return database.ref(`friendRequests/${friendId}/${userId}`).set({
+                username: currentUsername,
+                timestamp: new Date().toISOString()
+            });
+        })
+        .then(() => {
+            alert(`Vriendschapsverzoek verzonden naar ${friendUsername}!`);
+        })
+        .catch(error => {
+            console.error('Fout bij toevoegen van vriend:', error);
+            alert('Er is een fout opgetreden bij het verzenden van het vriendschapsverzoek.');
+        });
 }
 
 function loadFriendRequests() {
@@ -626,6 +633,8 @@ function loadFriendRequests() {
     database.ref(`friendRequests/${userId}`).once('value')
         .then(snapshot => {
             const requests = snapshot.val();
+            console.log('Vriendschapsverzoeken:', requests);
+
             if (requests) {
                 Object.entries(requests).forEach(([requesterId, requestData]) => {
                     // Maak een kaart voor elk verzoek
@@ -687,36 +696,35 @@ function loadFriendRequests() {
 }
 
 function acceptFriendRequest(userId, requesterId, requesterUsername) {
-    // Voeg de vriend toe aan de vriendenlijst
-    database.ref(`friends/${userId}/${requesterId}`).set({
-        username: requesterUsername,
-        timestamp: new Date().toISOString()
-    });
+    // Haal de gebruikersnaam van de huidige gebruiker op
+    database.ref(`users/${userId}`).once('value')
+        .then(snapshot => {
+            const currentUserData = snapshot.val();
+            const currentUsername = currentUserData?.username || 'Onbekend';
 
-    database.ref(`friends/${requesterId}/${userId}`).set({
-        username: auth.currentUser.displayName || 'Onbekend',
-        timestamp: new Date().toISOString()
-    });
-
-    // Verwijder het verzoek
-    database.ref(`friendRequests/${userId}/${requesterId}`).remove()
+            // Voeg de vriend toe aan de vriendenlijst van de huidige gebruiker
+            return Promise.all([
+                database.ref(`friends/${userId}/${requesterId}`).set({
+                    username: requesterUsername,
+                    timestamp: new Date().toISOString()
+                }),
+                // Voeg de huidige gebruiker toe aan de vriendenlijst van de requester
+                database.ref(`friends/${requesterId}/${userId}`).set({
+                    username: currentUsername,
+                    timestamp: new Date().toISOString()
+                }),
+                // Verwijder het verzoek
+                database.ref(`friendRequests/${userId}/${requesterId}`).remove()
+            ]);
+        })
         .then(() => {
             alert('Vriendschapsverzoek geaccepteerd!');
             loadFriendRequests(); // Vernieuw de lijst met verzoeken
+            loadFriends(); // Vernieuw de vriendenlijst
         })
         .catch(error => {
             console.error('Fout bij accepteren van vriendschapsverzoek:', error);
-        });
-}
-
-function declineFriendRequest(userId, requesterId) {
-    database.ref(`friendRequests/${userId}/${requesterId}`).remove()
-        .then(() => {
-            alert('Vriendschapsverzoek geweigerd.');
-            loadFriendRequests(); // Vernieuw de lijst met verzoeken
-        })
-        .catch(error => {
-            console.error('Fout bij weigeren van vriendschapsverzoek:', error);
+            alert('Er is een fout opgetreden bij het accepteren van het vriendschapsverzoek.');
         });
 }
 
@@ -734,6 +742,8 @@ function loadFriends() {
     database.ref(`friends/${userId}`).once('value')
         .then(snapshot => {
             const friends = snapshot.val();
+            console.log('Vrienden:', friends);
+
             if (friends) {
                 Object.entries(friends).forEach(([friendId, friendData]) => {
                     // Maak een kaart voor elke vriend
