@@ -448,17 +448,16 @@
             </button>
 
             <!-- Voorbeeld posts -->
-            <!-- <div class="card">
+            <div class="card">
                 <div class="card-image-container">
-                     <img src="https://via.placeholder.com/600x800" alt="Marathon"> -->
-                <!-- </div>
+                    <!-- <img src="https://via.placeholder.com/600x800" alt="Marathon"> -->
+                </div>
                 <div class="card-content">
                     <h3>David Martinez</h3>
                     <p>Just finished the marathon!</p>
                     <div class="card-time">2 uur geleden</div>
                 </div>
-            </div> --> 
-
+            </div>
 
             <!-- Posts worden hier toegevoegd -->
         </div>
@@ -467,10 +466,10 @@
     <!-- Camera Modal -->
     <div id="cameraModal">
         <div class="modal-content">
-            <h2>Take a picture</h2>
+            <h2>Maak een Foto</h2>
             <video id="cameraVideo" autoplay playsinline></video>
-            <button id="captureButton" class="btn-primary">Take Picture</button>
-            <button onclick="closeCameraModal()" class="btn-danger">Close</button>
+            <button id="captureButton" class="btn-primary">Neem Foto</button>
+            <button onclick="closeCameraModal()" class="btn-danger">Sluiten</button>
         </div>
     </div>
 
@@ -481,8 +480,8 @@
             <img id="previewImage" src="#" alt="Preview">
             <textarea id="postCaption" placeholder="Voeg een beschrijving toe..."></textarea>
             <div style="display: flex; justify-content: space-between;">
-                <button id="confirmPost" class="btn-primary">Post</button>
-                <button onclick="closePreviewModal()" class="btn-danger">Cancel</button>
+                <button id="confirmPost" class="btn-primary">Posten</button>
+                <button onclick="closePreviewModal()" class="btn-danger">Annuleren</button>
             </div>
         </div>
     </div>
@@ -490,23 +489,23 @@
     <!-- Login Popup -->
     <div id="loginPopup">
         <form id="loginForm">
-            <h2>Log in</h2>
+            <h2>Inloggen</h2>
             <input type="email" id="email" placeholder="Email" required autocomplete="email">
             <input type="password" id="password" placeholder="Wachtwoord" required autocomplete="current-password">
-            <button id="loginButton" type="submit">Log in</button> <!-- Voeg het ID 'loginButton' toe -->
-            <p><a href="#" onclick="openRegisterPopup()">Don't have a account yet Register/a></p>
+            <button id="loginButton" type="submit">Inloggen</button> <!-- Voeg het ID 'loginButton' toe -->
+            <p><a href="#" onclick="openRegisterPopup()">Nog geen account? Registreren</a></p>
         </form>
     </div>
 
     <!-- Registratie Popup -->
     <div id="registerPopup">
         <form id="registerForm">
-            <h2>Register</h2>
+            <h2>Registreren</h2>
             <input type="text" id="registerUsername" placeholder="Gebruikersnaam" required>
             <input type="email" id="registerEmail" placeholder="Email" required autocomplete="email">
             <input type="password" id="registerPassword" placeholder="Wachtwoord" required autocomplete="new-password">
-            <button id="registerButton" type="submit">Register</button>
-            <button type="button" onclick="closeRegisterPopup()">Cancel</button>
+            <button id="registerButton" type="submit">Registreren</button>
+            <button type="button" onclick="closeRegisterPopup()">Annuleren</button>
         </form>
     </div>
 
@@ -514,37 +513,37 @@
         <h2>Profile</h2>
         <form id="profileForm">
             <label for="profileUsername">Username:</label>
-            <input type="text" id="profileUsername" placeholder="Gebruikersnaam" required>
-            
+            <input type="text" id="profileUsername" placeholder="Username" required>
+
             <label for="profileEmail">Email:</label>
             <input type="email" id="profileEmail" placeholder="Email" disabled>
 
-            <label for="profilePhoto">ProfilePicture:</label>
+            <label for="profilePhoto">Profile Photo:</label>
             <input type="file" id="profilePhoto" accept="image/*">
-            <img id="profilePhotoPreview" src="#" alt="Profielfoto" style="display: none; width: 100px; height: 100px; border-radius: 50%; margin-top: 10px;">
+            <img id="profilePhotoPreview" src="#" alt="Profile Photo" style="display: none; width: 100px; height: 100px; border-radius: 50%; margin-top: 10px;">
 
-            <button type="submit" class="btn-primary">Save</button>
+            <button type="submit" class="btn-primary">Opslaan</button>
         </form>
-        <button onclick="logout()" class="btn-danger">Log out</button>
+        <button onclick="logout()" class="btn-danger">Save</button>
     </div>
 
     <div id="homePage" style="display: none; padding: 20px;">
         <h2>Home</h2>
-        <!-- <p>Welkom op de Homepagina!</p> -->
+        <p>Welcome to the Homepage!</p>
     </div>
 
     <div id="settingsPage" style="display: none; padding: 20px;">
         <h2>Settings</h2>
         <form id="settingsForm">
-            <label for="notificationToggle">Notifications</label>
+            <label for="notificationToggle">Notifications:</label>
             <input type="checkbox" id="notificationToggle">
             <button type="submit" class="btn-primary">Save</button>
         </form>
     </div>
 
     <div id="friendsPage" style="display: none; padding: 20px;">
-        <h2>Search Users</h2>
-        <input type="text" id="searchBar" placeholder="Zoek naar gebruikers..." style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px;">
+        <h2>Friends</h2>
+        <input type="text" id="searchBar" placeholder="Search for users..." style="width: 100%; padding: 10px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 5px;">
         <div id="searchResults" style="display: flex; flex-direction: column; gap: 15px;"></div>
 
         <h3>Your Friends</h3>
@@ -556,7 +555,7 @@
         <a href="#">Discover</a>
         <a href="#" onclick="showProfile()">Profile</a>
         <a href="#" onclick="showSettings()">Settings</a>
-        <a href="#" onclick="showFriends()">Friends</a> 
+        <a href="#" onclick="showFriends()">Friends</a>
     </div>
 
 <!-- Firebase scripts (MUST come before your app.js) -->
