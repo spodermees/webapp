@@ -371,18 +371,31 @@ function savePost(photoData, caption) {
         .then(() => console.log('Post opgeslagen in Firebase.'))
         .catch(error => console.error('Fout bij opslaan van post:', error));
 }
-function loadPosts() {
+async function loadPosts() {
+    const userId = auth.currentUser?.uid;
+    if (!userId) return;
+
+    // Haal vrienden op
+    const friendIds = await getFriendIds();
+    friendIds.push(userId); // Voeg jezelf toe
+
     database.ref('posts').once('value')
         .then(snapshot => {
             const posts = snapshot.val();
             if (posts) {
+                // Filter alleen posts van vrienden en jezelf
                 const postsArray = Object.entries(posts)
                     .map(([id, post]) => ({ id, ...post }))
+                    .filter(post => friendIds.includes(post.userId))
                     .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
-                postsArray.forEach(post => {
-                    if (document.getElementById(`post-${post.id}`)) return;
+                // Verwijder oude posts uit de container
+                const container = document.querySelector('.container');
+                // Verwijder alleen dynamisch toegevoegde posts (niet de voorbeeldpost)
+                Array.from(container.querySelectorAll('.card'))
+                    .forEach(card => card.remove());
 
+                postsArray.forEach(post => {
                     const postCard = document.createElement('div');
                     postCard.className = 'card';
                     postCard.id = `post-${post.id}`;
@@ -444,7 +457,6 @@ function loadPosts() {
                             postCard.appendChild(contentDiv);
 
                             // Voeg de post toe aan de container
-                            const container = document.querySelector('.container');
                             container.appendChild(postCard);
                         })
                         .catch(error => {
@@ -457,7 +469,6 @@ function loadPosts() {
             console.error('Fout bij laden van posts:', error);
         });
 }
-
 // Helper function
 function formatTime(timestamp) {
     const now = new Date();
@@ -802,4 +813,12 @@ function loadFriends() {
         .catch(error => {
             console.error('Fout bij ophalen van vriendenlijst:', error);
         });
+}
+
+async function getFriendIds() {
+    const userId = auth.currentUser?.uid;
+    if (!userId) return [];
+    const snapshot = await database.ref(`friends/${userId}`).once('value');
+    const friends = snapshot.val();
+    return friends ? Object.keys(friends) : [];
 }
