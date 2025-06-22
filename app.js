@@ -16,6 +16,7 @@ const database = firebase.database();
 
 // Global variables
 let videoStream;
+let searchToken = 0;
 
 // DOM elements
 const loginPopup = document.getElementById('loginPopup');
@@ -109,9 +110,15 @@ function setupEventListeners() {
         const resultsContainer = document.getElementById('searchResults');
         resultsContainer.innerHTML = ''; // Wis eerdere resultaten
 
+        // Verhoog de token bij elke nieuwe zoekopdracht
+        const currentToken = ++searchToken;
+
         if (query.length > 0) {
             database.ref('users').once('value')
                 .then(snapshot => {
+                    // Alleen de laatste zoekopdracht mag resultaten tonen
+                    if (currentToken !== searchToken) return;
+
                     const users = snapshot.val();
                     if (users) {
                         Object.entries(users).forEach(([userId, userData]) => {
